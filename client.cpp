@@ -12,5 +12,7 @@ int main()
 
         std::cout << "All good" << std::endl;
 
+        enet_deinitialize();
+
         return EXIT_SUCCESS;
 }
