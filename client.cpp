@@ -13,7 +13,7 @@ struct Client
 
         Host host;
         Peer server;
-        sf::Vector2f playerPos;
+        sf::Vector2f position;
         bool running;
 
         sf::RenderWindow window;
@@ -64,7 +64,7 @@ int main()
 }
 
 Client::Client()
-        : playerPos(0.0f, 0.0f)
+        : position(0.0f, 0.0f)
         , running(true)
         , window(sf::VideoMode(400, 400), "App")
 {
@@ -104,11 +104,11 @@ void Client::update(const sf::Time)
                 }
                 else if (event.type == Event::Type::Receive)
                 {
-                        event.packet >> playerPos.x;
-                        event.packet >> playerPos.y;
+                        event.packet >> position.x;
+                        event.packet >> position.y;
 
-                        std::cout << "Pos = " << playerPos.x << ", ";
-                        std::cout << playerPos.y << std::endl;
+                        std::cout << "Pos = " << position.x << ", ";
+                        std::cout << position.y << std::endl;
                 }
         }
 }
@@ -118,7 +118,7 @@ void Client::draw()
         window.clear();
 
         sf::CircleShape shape(20.0f);
-        shape.setPosition(playerPos);
+        shape.setPosition(position);
         window.draw(shape);
 
         window.display();
