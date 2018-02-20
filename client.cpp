@@ -6,25 +6,22 @@
 
 struct Client
 {
-        Client() : playerX(0.0f), playerY(0.0f), running(true) {}
+        Client();
+        void update(const sf::Time);
+        void draw();
+        void processInput();
 
         Host host;
         Peer server;
-        float playerX;
-        float playerY;
+        sf::Vector2f playerPos;
         bool running;
 
         sf::RenderWindow window;
 };
 
-void update(const sf::Time, Client&);
-void draw(Client&);
-Uint8 processInput();
-
 int main()
 {
         Client client;
-        client.window.create(sf::VideoMode(400, 400), "App");
 
         if (enet_initialize() != 0)
         {
@@ -55,10 +52,10 @@ int main()
                 {
                         accumulator -= TIME_PER_TICK;
 
-                        update(TIME_PER_TICK, client);
+                        client.update(TIME_PER_TICK);
                 }
 
-                draw(client);
+                client.draw();
         }
 
         enet_deinitialize();
@@ -66,35 +63,39 @@ int main()
         return EXIT_SUCCESS;
 }
 
-void update(const sf::Time, Client& client)
+Client::Client()
+        : playerPos(0.0f, 0.0f)
+        , running(true)
+        , window(sf::VideoMode(400, 400), "App")
+{
+}
+
+void Client::update(const sf::Time)
 {
         sf::Event sfEvent;
-        while (client.window.pollEvent(sfEvent))
+        while (window.pollEvent(sfEvent))
         {
                 if (sfEvent.type == sf::Event::Closed)
                 {
-                        client.host.disconnectAll();
-                        client.window.close();
-                        client.running = false;
+                        host.disconnectAll();
+                        window.close();
+                        running = false;
                 }
         }
 
-        if (client.server)
+        if (server)
         {
-                Uint8 input = processInput();
-                Packet packet;
-                packet << input;
-                client.host.send(client.server, packet);
+                processInput();
         }
 
         Event event;
-        while (client.host.pollEvent(event))
+        while (host.pollEvent(event))
         {
                 if (event.type == Event::Type::Connect)
                 {
                         std::cout << "Connection[id=" << event.peer.id;
                         std::cout << "]" << std::endl;
-                        client.server = event.peer;
+                        server = event.peer;
                 }
                 else if (event.type == Event::Type::Disconnect)
                 {
@@ -103,28 +104,29 @@ void update(const sf::Time, Client& client)
                 }
                 else if (event.type == Event::Type::Receive)
                 {
-                        event.packet >> client.playerX;
-                        event.packet >> client.playerY;
+                        event.packet >> playerPos.x;
+                        event.packet >> playerPos.y;
 
-                        std::cout << "Pos = " << client.playerX << ", ";
-                        std::cout << client.playerY << std::endl;
+                        std::cout << "Pos = " << playerPos.x << ", ";
+                        std::cout << playerPos.y << std::endl;
                 }
         }
 }
 
-void draw(Client& client)
+void Client::draw()
 {
-        client.window.clear();
+        window.clear();
 
         sf::CircleShape shape(20.0f);
-        shape.setPosition(client.playerX, client.playerY);
-        client.window.draw(shape);
+        shape.setPosition(playerPos);
+        window.draw(shape);
 
-        client.window.display();
+        window.display();
 }
 
-Uint8 processInput()
+void Client::processInput()
 {
+        Packet packet;
         Uint8 input = 0x0;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
@@ -136,5 +138,6 @@ Uint8 processInput()
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
                 input |= 0x8;
 
-        return input;
+        packet << input;
+        host.send(server, packet);
 }

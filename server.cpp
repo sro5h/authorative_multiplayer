@@ -6,20 +6,17 @@
 
 struct Server
 {
-        Server() : playerX(0.0f), playerY(0.0f), running(true) {}
+        Server();
+        void update(const sf::Time);
 
         Host host;
-        float playerX;
-        float playerY;
+        sf::Vector2f playerPos;
         bool running;
 };
-
-void update(const sf::Time, Server&);
 
 int main()
 {
         Server server;
-        server.running = true;
 
         if (enet_initialize() != 0)
         {
@@ -44,7 +41,7 @@ int main()
                 {
                         accumulator -= TIME_PER_TICK;
 
-                        update(TIME_PER_TICK, server);
+                        server.update(TIME_PER_TICK);
                 }
 
         }
@@ -54,10 +51,16 @@ int main()
         return EXIT_SUCCESS;
 }
 
-void update(const sf::Time, Server& server)
+Server::Server()
+        : playerPos(0.0f, 0.0f)
+        , running(true)
+{
+}
+
+void Server::update(const sf::Time)
 {
         Event event;
-        while (server.host.pollEvent(event))
+        while (host.pollEvent(event))
         {
                 if (event.type == Event::Type::Connect)
                 {
@@ -76,24 +79,24 @@ void update(const sf::Time, Server& server)
 
                         if (input & 0x1) // Right
                         {
-                                server.playerX += 1;
+                                playerPos.x += 1;
                         }
                         if (input & 0x2) // Left
                         {
-                                server.playerX -= 1;
+                                playerPos.x -= 1;
                         }
                         if (input & 0x4) // Up
                         {
-                                server.playerY += 1;
+                                playerPos.y -= 1;
                         }
                         if (input & 0x8) // Down
                         {
-                                server.playerY -= 1;
+                                playerPos.y += 1;
                         }
                 }
         }
 
         Packet packet;
-        packet << server.playerX << server.playerY;
-        server.host.broadcast(packet);
+        packet << playerPos.x << playerPos.y;
+        host.broadcast(packet);
 }
