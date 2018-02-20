@@ -10,7 +10,8 @@ struct Server
         void update(const sf::Time);
 
         Host host;
-        sf::Vector2f playerPos;
+        sf::Vector2f position;
+        sf::Vector2f velocity;
         bool running;
 };
 
@@ -52,12 +53,13 @@ int main()
 }
 
 Server::Server()
-        : playerPos(0.0f, 0.0f)
+        : position(0.0f, 0.0f)
+        , velocity(0.0f, 0.0f)
         , running(true)
 {
 }
 
-void Server::update(const sf::Time)
+void Server::update(const sf::Time elapsed)
 {
         Event event;
         while (host.pollEvent(event))
@@ -77,26 +79,33 @@ void Server::update(const sf::Time)
                         Uint8 input;
                         event.packet >> input;
 
+                        sf::Vector2f acceleration;
                         if (input & 0x1) // Right
                         {
-                                playerPos.x += 1;
+                                acceleration.x += ACCELERATION;
                         }
                         if (input & 0x2) // Left
                         {
-                                playerPos.x -= 1;
+                                acceleration.x -= ACCELERATION;
                         }
                         if (input & 0x4) // Up
                         {
-                                playerPos.y -= 1;
+                                acceleration.y -= ACCELERATION;
                         }
                         if (input & 0x8) // Down
                         {
-                                playerPos.y += 1;
+                                acceleration.y += ACCELERATION;
                         }
+
+                        velocity += acceleration * elapsed.asSeconds();
+                        float frictionRatio = 1 / (1 + FRICTION * elapsed.asSeconds());
+                        velocity *= frictionRatio;
+
+                        position += velocity * elapsed.asSeconds();
                 }
         }
 
         Packet packet;
-        packet << playerPos.x << playerPos.y;
+        packet << position.x << position.y;
         host.broadcast(packet);
 }
