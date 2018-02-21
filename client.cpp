@@ -3,6 +3,15 @@
 #include <enet/enet.h>
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <map>
+#include <cassert>
+
+struct PlayerState
+{
+        PlayerState();
+
+        sf::Vector2f position;
+};
 
 struct Client
 {
@@ -13,8 +22,9 @@ struct Client
 
         Host host;
         Peer server;
-        sf::Vector2f position;
         bool running;
+
+        std::map<Peer, PlayerState> players;
 
         sf::RenderWindow window;
 };
@@ -63,9 +73,13 @@ int main()
         return EXIT_SUCCESS;
 }
 
-Client::Client()
+PlayerState::PlayerState()
         : position(0.0f, 0.0f)
-        , running(true)
+{
+}
+
+Client::Client()
+        : running(true)
         , window(sf::VideoMode(400, 400), "App")
 {
 }
@@ -95,20 +109,31 @@ void Client::update(const sf::Time)
                 {
                         std::cout << "Connection[id=" << event.peer.id;
                         std::cout << "]" << std::endl;
+
                         server = event.peer;
+                        players.insert({ server, PlayerState() });
                 }
                 else if (event.type == Event::Type::Disconnect)
                 {
                         std::cout << "Disconnection[id=";
                         std::cout << event.peer.id << "]" << std::endl;
+
+                        std::size_t rc;
+                        rc = players.erase(server);
+                        assert(rc == 1);
                 }
                 else if (event.type == Event::Type::Receive)
                 {
-                        event.packet >> position.x;
-                        event.packet >> position.y;
-
-                        std::cout << "Pos = " << position.x << ", ";
-                        std::cout << position.y << std::endl;
+                        Uint16 id;
+                        while (event.packet >> id)
+                        {
+                                if (id == server.id)
+                                {
+                                        PlayerState& state = players.at(server);
+                                        event.packet >> state.position.x;
+                                        event.packet >> state.position.y;
+                                }
+                        }
                 }
         }
 }
@@ -117,9 +142,13 @@ void Client::draw()
 {
         window.clear();
 
-        sf::CircleShape shape(20.0f);
-        shape.setPosition(position);
-        window.draw(shape);
+        if (server)
+        {
+                PlayerState& state = players.at(server);
+                sf::CircleShape shape(20.0f);
+                shape.setPosition(state.position);
+                window.draw(shape);
+        }
 
         window.display();
 }

@@ -39,6 +39,8 @@ public:
          */
         bool operator==(const Peer& other) const;
 
+        bool operator<(const Peer& other) const;
+
         /**
          * Returns whether the Peer is in a valid state.
          * This means the associated ENetPeer exists.

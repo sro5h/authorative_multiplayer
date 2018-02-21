@@ -3,16 +3,35 @@
 #include <enet/enet.h>
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <map>
+#include <cassert>
+
+struct PlayerState
+{
+        PlayerState();
+
+        sf::Vector2f position;
+        sf::Vector2f velocity;
+};
+
+struct PlayerInput
+{
+        PlayerInput();
+
+        bool right, left, up, down;
+};
 
 struct Server
 {
         Server();
         void update(const sf::Time);
+        void updatePlayers(const sf::Time);
 
         Host host;
-        sf::Vector2f position;
-        sf::Vector2f velocity;
         bool running;
+
+        std::map<Peer, PlayerState> players;
+        std::map<Peer, PlayerInput> inputs;
 };
 
 int main()
@@ -52,10 +71,22 @@ int main()
         return EXIT_SUCCESS;
 }
 
-Server::Server()
+PlayerState::PlayerState()
         : position(0.0f, 0.0f)
         , velocity(0.0f, 0.0f)
-        , running(true)
+{
+}
+
+PlayerInput::PlayerInput()
+        : right(false)
+        , left(false)
+        , up(false)
+        , down(false)
+{
+}
+
+Server::Server()
+        : running(true)
 {
 }
 
@@ -68,44 +99,69 @@ void Server::update(const sf::Time elapsed)
                 {
                         std::cout << "Connection[id=" << event.peer.id;
                         std::cout << "]" << std::endl;
+
+                        players.insert({ event.peer, PlayerState() });
+                        inputs.insert({ event.peer, PlayerInput() });
                 }
                 else if (event.type == Event::Type::Disconnect)
                 {
                         std::cout << "Disconnection[id=";
                         std::cout << event.peer.id << "]" << std::endl;
+
+                        std::size_t rc;
+                        rc = inputs.erase(event.peer);
+                        assert(rc == 1);
+                        rc = players.erase(event.peer);
+                        assert(rc == 1);
                 }
                 else if (event.type == Event::Type::Receive)
                 {
                         Uint8 input;
                         event.packet >> input;
 
-                        sf::Vector2f acceleration;
-                        if (input & 0x1) // Right
-                        {
-                                acceleration.x += ACCELERATION;
-                        }
-                        if (input & 0x2) // Left
-                        {
-                                acceleration.x -= ACCELERATION;
-                        }
-                        if (input & 0x4) // Up
-                        {
-                                acceleration.y -= ACCELERATION;
-                        }
-                        if (input & 0x8) // Down
-                        {
-                                acceleration.y += ACCELERATION;
-                        }
-
-                        velocity += acceleration * elapsed.asSeconds();
-                        float frictionRatio = 1 / (1 + FRICTION * elapsed.asSeconds());
-                        velocity *= frictionRatio;
-
-                        position += velocity * elapsed.asSeconds();
+                        PlayerInput& playerInput = inputs.at(event.peer);
+                        playerInput.right = input & 0x1;
+                        playerInput.left = input & 0x2;
+                        playerInput.up = input & 0x4;
+                        playerInput.down = input & 0x8;
                 }
         }
 
-        Packet packet;
-        packet << position.x << position.y;
-        host.broadcast(packet);
+        updatePlayers(elapsed);
+
+        if (!players.empty())
+        {
+                Packet packet;
+
+                for (auto& pair: players)
+                {
+                        packet << pair.first.id;
+                        packet << pair.second.position.x;
+                        packet << pair.second.position.y;
+                }
+
+                host.broadcast(packet);
+        }
+}
+
+void Server::updatePlayers(const sf::Time elapsed)
+{
+        for (auto& pair: inputs)
+        {
+                sf::Vector2f acceleration;
+                if (pair.second.right)
+                        acceleration.x += ACCELERATION;
+                if (pair.second.left)
+                        acceleration.x -= ACCELERATION;
+                if (pair.second.up)
+                        acceleration.y -= ACCELERATION;
+                if (pair.second.down)
+                        acceleration.y += ACCELERATION;
+
+                PlayerState& state = players.at(pair.first);
+                state.velocity += acceleration * elapsed.asSeconds();
+                float friction = 1 / (1 + FRICTION * elapsed.asSeconds());
+                state.velocity *= friction;
+                state.position += state.velocity * elapsed.asSeconds();
+        }
 }

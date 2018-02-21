@@ -12,4 +12,14 @@ const sf::Time TIME_PER_TICK = sf::microseconds(50000);
 constexpr float ACCELERATION = 200.0f;
 constexpr float FRICTION = 5.0f;
 
+enum class ClientMessage : Uint8
+{
+        Input,
+};
+
+enum class ServerMessage : Uint8
+{
+        State,
+};
+
 #endif // COMMON_HPP_INCLUDED
