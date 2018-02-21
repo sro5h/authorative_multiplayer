@@ -105,19 +105,15 @@ void Client::update(const sf::Time)
         Event event;
         while (host.pollEvent(event))
         {
+                logEvent(event);
+
                 if (event.type == Event::Type::Connect)
                 {
-                        std::cout << "Connection[id=" << event.peer.id;
-                        std::cout << "]" << std::endl;
-
                         server = event.peer;
                         players.insert({ server, PlayerState() });
                 }
                 else if (event.type == Event::Type::Disconnect)
                 {
-                        std::cout << "Disconnection[id=";
-                        std::cout << event.peer.id << "]" << std::endl;
-
                         std::size_t rc;
                         rc = players.erase(server);
                         assert(rc == 1);

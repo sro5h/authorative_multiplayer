@@ -14,7 +14,7 @@ SERVER_SOURCES = server.cpp
 SERVER_OBJECTS = $(subst .cpp,.o,$(SERVER_SOURCES))
 
 COMMON_HEADERS = Event.hpp Packet.hpp Host.hpp Peer.hpp Common.hpp
-COMMON_SOURCES = Event.cpp Packet.cpp Host.cpp Peer.cpp
+COMMON_SOURCES = Event.cpp Packet.cpp Host.cpp Peer.cpp Common.cpp
 COMMON_OBJECTS = $(subst .cpp,.o,$(COMMON_SOURCES))
 
 all: $(CLIENT) $(SERVER)

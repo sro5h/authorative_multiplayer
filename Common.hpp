@@ -22,4 +22,6 @@ enum class ServerMessage : Uint8
         State,
 };
 
+void logEvent(const Event& event);
+
 #endif // COMMON_HPP_INCLUDED
