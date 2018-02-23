@@ -4,13 +4,13 @@ CXXFLAGS = -I. -Wall -Wextra -std=c++14
 LDFLAGS = -lenet -lsfml-graphics -lsfml-window -lsfml-system
 
 CLIENT = cl.out
-CLIENT_HEADERS =
-CLIENT_SOURCES = client.cpp
+CLIENT_HEADERS = GameClient.hpp
+CLIENT_SOURCES = client.cpp GameClient.cpp
 CLIENT_OBJECTS = $(subst .cpp,.o,$(CLIENT_SOURCES))
 
 SERVER = sv.out
-SERVER_HEADERS =
-SERVER_SOURCES = server.cpp
+SERVER_HEADERS = GameServer.hpp
+SERVER_SOURCES = server.cpp GameServer.cpp
 SERVER_OBJECTS = $(subst .cpp,.o,$(SERVER_SOURCES))
 
 COMMON_HEADERS = Event.hpp Packet.hpp Host.hpp Peer.hpp Common.hpp

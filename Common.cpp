@@ -15,3 +15,17 @@ void logEvent(const Event& event)
                 std::cout << " from peer " << event.peer.id << std::endl;
         }
 }
+
+PlayerState::PlayerState()
+        : position(0.0f, 0.0f)
+        , velocity(0.0f, 0.0f)
+{
+}
+
+PlayerInput::PlayerInput()
+        : right(false)
+        , left(false)
+        , up(false)
+        , down(false)
+{
+}
