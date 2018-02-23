@@ -14,7 +14,7 @@ public:
         void update(sf::Time time);
         void draw();
 
-        bool create();
+        bool create(Uint16 port);
         bool connect(const std::string& address, Uint16 port);
         bool isRunning();
 
@@ -26,8 +26,6 @@ private:
         void onReceive(Peer& peer, Packet& packet);
 
 private:
-        const Uint16 mPort;
-
         sf::RenderWindow mWindow;
 
         Host mHost;

@@ -3,8 +3,9 @@
 #include <enet/enet.h>
 #include <iostream>
 
-int main()
+int main(int argc, char** argv)
 {
+        Uint16 port = PORT_CL;
         GameClient client;
 
         if (enet_initialize() != 0)
@@ -13,7 +14,13 @@ int main()
                 return EXIT_FAILURE;
         }
 
-        if (!client.create())
+        if (argc == 2)
+        {
+                port = std::atoi(argv[1]);
+                std::cout << "Port " << port << std::endl;
+        }
+
+        if (!client.create(port))
         {
                 return EXIT_FAILURE;
         }

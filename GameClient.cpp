@@ -3,8 +3,7 @@
 #include <cassert>
 
 GameClient::GameClient()
-        : mPort(PORT_CL)
-        , mWindow(sf::VideoMode(400, 400), "App")
+        : mWindow(sf::VideoMode(400, 400), "App")
         , mRunning(true)
 {
 }
@@ -115,9 +114,9 @@ void GameClient::draw()
         mWindow.display();
 }
 
-bool GameClient::create()
+bool GameClient::create(Uint16 port)
 {
-        if (!mHost.create("localhost", mPort, 5))
+        if (!mHost.create("localhost", port, 5))
         {
                 std::cerr << "Could not create the host" << std::endl;
                 return false;
