@@ -1,5 +1,5 @@
-#ifndef PEER_HPP
-#define PEER_HPP
+#ifndef PEER_HPP_INCLUDED
+#define PEER_HPP_INCLUDED
 
 #include "Types.hpp"
 #include <string>
@@ -33,13 +33,12 @@ public:
 
 public:
         /**
-         * Compares the Peer::id to test whether both Peers are the same.
+         * Compares the internal ENetPeer pointer to test whether both Peers
+         * are the same.
          * @param other The other Peer to compare this to
          * @return True if both are the same
          */
         bool operator==(const Peer& other) const;
-
-        bool operator<(const Peer& other) const;
 
         /**
          * Returns whether the Peer is in a valid state.
@@ -51,14 +50,15 @@ public:
 public:
         std::string address;
         Uint16 port;
-        Uint16 id;
+        Uint16 incomingId;
         Uint16 outgoingId;
+        Uint32 connectId;
 
 private:
         ENetPeer* peer;
 
         friend class Host;
-        friend void toEvent(Event&, const ENetEvent&);
+        friend void convertPeer(Peer&, ENetPeer&);
 };
 
-#endif // PEER_HPP
+#endif // PEER_HPP_INCLUDED

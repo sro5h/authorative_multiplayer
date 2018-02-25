@@ -1,5 +1,5 @@
-#ifndef HOST_HPP
-#define HOST_HPP
+#ifndef HOST_HPP_INCLUDED
+#define HOST_HPP_INCLUDED
 
 #include "Event.hpp"
 
@@ -85,10 +85,10 @@ public:
          * @param peer The Peer to send the Packet to
          * @param packet The Packet to send
          */
-        void send(const Peer& peer, const Packet& packet);
+        bool send(const Peer& peer, const Packet& packet);
 
 private:
         ENetHost* mHost;
 };
 
-#endif // HOST_HPP
+#endif // HOST_HPP_INCLUDED
