@@ -36,7 +36,7 @@ void GameServer::update(sf::Time delta)
                 Packet packet;
                 for (const auto& pair: mPlayers)
                 {
-                        packet << pair.first.id;
+                        packet << pair.first;
                         packet << pair.second.position.x;
                         packet << pair.second.position.y;
                 }
@@ -47,30 +47,30 @@ void GameServer::update(sf::Time delta)
 
 void GameServer::onConnect(Peer& peer)
 {
-        assert(mPlayers.find(peer) == mPlayers.end());
-        assert(mPlayerInputs.find(peer) == mPlayerInputs.end());
+        assert(mPlayers.find(peer.incomingId) == mPlayers.end());
+        assert(mPlayerInputs.find(peer.incomingId) == mPlayerInputs.end());
 
-        mPlayers.insert({ peer, PlayerState() });
-        mPlayerInputs.insert({ peer, PlayerInput() });
+        mPlayers.insert({ peer.incomingId, PlayerState() });
+        mPlayerInputs.insert({ peer.incomingId, PlayerInput() });
 }
 
 void GameServer::onDisconnect(Peer& peer)
 {
-        assert(mPlayers.find(peer) != mPlayers.end());
-        assert(mPlayerInputs.find(peer) != mPlayerInputs.end());
+        assert(mPlayers.find(peer.incomingId) != mPlayers.end());
+        assert(mPlayerInputs.find(peer.incomingId) != mPlayerInputs.end());
 
-        mPlayerInputs.erase(peer);
-        mPlayers.erase(peer);
+        mPlayerInputs.erase(peer.incomingId);
+        mPlayers.erase(peer.incomingId);
 }
 
 void GameServer::onReceive(Peer& peer, Packet& packet)
 {
-        assert(mPlayerInputs.find(peer) != mPlayerInputs.end());
+        assert(mPlayerInputs.find(peer.incomingId) != mPlayerInputs.end());
 
         Uint8 input;
         packet >> input;
 
-        PlayerInput& playerInput = mPlayerInputs.at(peer);
+        PlayerInput& playerInput = mPlayerInputs[peer.incomingId];
         playerInput.right = input & 0x1;
         playerInput.left  = input & 0x2;
         playerInput.up    = input & 0x4;
@@ -94,7 +94,7 @@ void GameServer::updatePlayers(sf::Time delta)
                 if (pair.second.down)
                         accel.y += ACCELERATION;
 
-                PlayerState& state = mPlayers.at(pair.first);
+                PlayerState& state = mPlayers[pair.first];
                 state.velocity += accel * delta.asSeconds();
                 float friction = 1 / (1 + FRICTION * delta.asSeconds());
                 state.velocity *= friction;

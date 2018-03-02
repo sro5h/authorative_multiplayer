@@ -68,7 +68,7 @@ void GameClient::onReceive(Peer&, Packet& packet)
         {
                 assert(mPlayers.find(peerId) != mPlayers.end());
 
-                PlayerState& state = mPlayers.at(peerId);
+                PlayerState& state = mPlayers[peerId];
 
                 packet >> state.position.x;
                 packet >> state.position.y;

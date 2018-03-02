@@ -7,13 +7,13 @@ void logEvent(const Event& event)
         if (event.type == Event::Type::Connect)
         {
                 std::cout << "Connect";
-                std::cout << " from peer with id " << event.peer.id;
+                std::cout << " from peer with id " << event.peer.incomingId;
                 std::cout << ":" << event.peer.outgoingId << std::endl;
         }
         else if (event.type == Event::Type::Disconnect)
         {
                 std::cout << "Disconnect";
-                std::cout << " from peer with id " << event.peer.id;
+                std::cout << " from peer with id " << event.peer.incomingId;
                 std::cout << ":" << event.peer.outgoingId << std::endl;
         }
 }
