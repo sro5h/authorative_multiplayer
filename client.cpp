@@ -22,11 +22,13 @@ int main(int argc, char** argv)
 
         if (!client.create(port))
         {
+                enet_deinitialize();
                 return EXIT_FAILURE;
         }
 
         if (!client.connect("localhost", PORT_SV))
         {
+                enet_deinitialize();
                 return EXIT_FAILURE;
         }
 

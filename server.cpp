@@ -15,6 +15,7 @@ int main()
 
         if (!server.create())
         {
+                enet_deinitialize();
                 return EXIT_FAILURE;
         }
 
