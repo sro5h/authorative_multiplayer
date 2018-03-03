@@ -29,8 +29,8 @@ private:
         Host mHost;
         bool mRunning;
 
-        std::map<Uint16, PlayerState> mPlayers;
-        std::map<Uint16, PlayerInput> mPlayerInputs;
+        std::map<Uint32, PlayerState> mPlayers;
+        std::map<Uint32, PlayerInput> mPlayerInputs;
 };
 
 #endif // GAME_SERVER_HPP_INCLUDED

@@ -47,30 +47,30 @@ void GameServer::update(sf::Time delta)
 
 void GameServer::onConnect(Peer& peer)
 {
-        assert(mPlayers.find(peer.incomingId) == mPlayers.end());
-        assert(mPlayerInputs.find(peer.incomingId) == mPlayerInputs.end());
+        assert(mPlayers.find(peer.connectId) == mPlayers.end());
+        assert(mPlayerInputs.find(peer.connectId) == mPlayerInputs.end());
 
-        mPlayers.insert({ peer.incomingId, PlayerState() });
-        mPlayerInputs.insert({ peer.incomingId, PlayerInput() });
+        mPlayers.insert({ peer.connectId, PlayerState() });
+        mPlayerInputs.insert({ peer.connectId, PlayerInput() });
 }
 
 void GameServer::onDisconnect(Peer& peer)
 {
-        assert(mPlayers.find(peer.incomingId) != mPlayers.end());
-        assert(mPlayerInputs.find(peer.incomingId) != mPlayerInputs.end());
+        assert(mPlayers.find(peer.connectId) != mPlayers.end());
+        assert(mPlayerInputs.find(peer.connectId) != mPlayerInputs.end());
 
-        mPlayerInputs.erase(peer.incomingId);
-        mPlayers.erase(peer.incomingId);
+        mPlayerInputs.erase(peer.connectId);
+        mPlayers.erase(peer.connectId);
 }
 
 void GameServer::onReceive(Peer& peer, Packet& packet)
 {
-        assert(mPlayerInputs.find(peer.incomingId) != mPlayerInputs.end());
+        assert(mPlayerInputs.find(peer.connectId) != mPlayerInputs.end());
 
         Uint8 input;
         packet >> input;
 
-        PlayerInput& playerInput = mPlayerInputs[peer.incomingId];
+        PlayerInput& playerInput = mPlayerInputs[peer.connectId];
         playerInput.right = input & 0x1;
         playerInput.left  = input & 0x2;
         playerInput.up    = input & 0x4;

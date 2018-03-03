@@ -48,27 +48,27 @@ void GameClient::update(sf::Time)
 
 void GameClient::onConnect(Peer& peer)
 {
-        assert(mPlayers.find(peer.outgoingId) == mPlayers.end());
+        assert(mPlayers.find(peer.connectId) == mPlayers.end());
 
         mPeer = peer;
-        mPlayers.insert({ mPeer.outgoingId, PlayerState() });
+        mPlayers.insert({ mPeer.connectId, PlayerState() });
 }
 
 void GameClient::onDisconnect(Peer& peer)
 {
-        assert(mPlayers.find(peer.outgoingId) != mPlayers.end());
+        assert(mPlayers.find(peer.connectId) != mPlayers.end());
 
-        mPlayers.erase(mPeer.outgoingId);
+        mPlayers.erase(mPeer.connectId);
 }
 
 void GameClient::onReceive(Peer&, Packet& packet)
 {
-        Uint16 peerId;
-        while (packet >> peerId)
+        Uint32 connectId;
+        while (packet >> connectId)
         {
-                assert(mPlayers.find(peerId) != mPlayers.end());
+                assert(mPlayers.find(connectId) != mPlayers.end());
 
-                PlayerState& state = mPlayers[peerId];
+                PlayerState& state = mPlayers[connectId];
 
                 packet >> state.position.x;
                 packet >> state.position.y;
@@ -105,7 +105,7 @@ void GameClient::draw()
                 sf::CircleShape shape(20.0f);
                 shape.setPosition(pair.second.position);
 
-                if (pair.first == mPeer.outgoingId)
+                if (pair.first == mPeer.connectId)
                         shape.setFillColor(sf::Color::Green);
 
                 mWindow.draw(shape);

@@ -32,7 +32,7 @@ private:
         Peer mPeer;
         bool mRunning;
 
-        std::map<Uint16, PlayerState> mPlayers;
+        std::map<Uint32, PlayerState> mPlayers;
 };
 
 #endif // GAME_CLIENT_HPP_INCLUDED
