@@ -23,6 +23,8 @@ private:
         void onDisconnect(Peer& peer);
         void onReceive(Peer& peer, Packet& packet);
 
+        void onReceiveInput(Peer& peer, Packet& packet);
+
 private:
         const Uint16 mPort;
 

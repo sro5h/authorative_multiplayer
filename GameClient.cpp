@@ -56,17 +56,48 @@ void GameClient::onConnect(Peer& peer)
 
 void GameClient::onDisconnect(Peer& peer)
 {
+        assert(mPeer == peer);
         assert(mPlayers.find(peer.connectId) != mPlayers.end());
 
         mPlayers.erase(mPeer.connectId);
 }
 
-void GameClient::onReceive(Peer&, Packet& packet)
+void GameClient::onReceive(Peer& peer, Packet& packet)
+{
+        assert(mPeer == peer);
+        assert(packet.getDataSize() > 0);
+
+        ServerMessage msgType;
+        packet >> msgType;
+
+        switch (msgType)
+        {
+                case ServerMessage::State:
+                {
+                        onReceiveState(peer, packet);
+                }
+                break;
+
+                default:
+                {
+                        std::cerr << "Unknown message type ";
+                        std::cerr << static_cast<Uint8>(msgType) << std::endl;
+                }
+                break;
+        }
+}
+
+void GameClient::onReceiveState(Peer&, Packet& packet)
 {
         Uint32 connectId;
         while (packet >> connectId)
         {
-                assert(mPlayers.find(connectId) != mPlayers.end());
+                if (mPlayers.find(connectId) == mPlayers.end())
+                {
+                        std::cerr << "Received state of unknown player ";
+                        std::cerr << connectId << std::endl;
+                        continue;
+                }
 
                 PlayerState& state = mPlayers[connectId];
 
@@ -92,6 +123,7 @@ void GameClient::processInput()
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
                 input |= 0x8;
 
+        packet << ClientMessage::Input;
         packet << input;
         mHost.send(mPeer, packet);
 }

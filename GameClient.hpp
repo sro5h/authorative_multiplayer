@@ -25,6 +25,8 @@ private:
         void onDisconnect(Peer& peer);
         void onReceive(Peer& peer, Packet& packet);
 
+        void onReceiveState(Peer& peer, Packet& packet);
+
 private:
         sf::RenderWindow mWindow;
 

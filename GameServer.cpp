@@ -34,6 +34,8 @@ void GameServer::update(sf::Time delta)
         if (!mPlayers.empty())
         {
                 Packet packet;
+                packet << ServerMessage::State;
+
                 for (const auto& pair: mPlayers)
                 {
                         packet << pair.first;
@@ -66,15 +68,38 @@ void GameServer::onDisconnect(Peer& peer)
 void GameServer::onReceive(Peer& peer, Packet& packet)
 {
         assert(mPlayerInputs.find(peer.connectId) != mPlayerInputs.end());
+        assert(packet.getDataSize() > 0);
 
-        Uint8 input;
-        packet >> input;
+        ClientMessage msgType;
+        packet >> msgType;
 
-        PlayerInput& playerInput = mPlayerInputs[peer.connectId];
-        playerInput.right = input & 0x1;
-        playerInput.left  = input & 0x2;
-        playerInput.up    = input & 0x4;
-        playerInput.down  = input & 0x8;
+        switch (msgType)
+        {
+                case ClientMessage::Input:
+                {
+                        onReceiveInput(peer, packet);
+                }
+                break;
+
+                default:
+                {
+                        std::cerr << "Unknown message type ";
+                        std::cerr << static_cast<Uint8>(msgType) << std::endl;
+                }
+                break;
+        }
+}
+
+void GameServer::onReceiveInput(Peer& peer, Packet& packet)
+{
+        Uint8 data;
+        packet >> data;
+
+        PlayerInput& input = mPlayerInputs[peer.connectId];
+        input.right = data & 0x1;
+        input.left  = data & 0x2;
+        input.up    = data & 0x4;
+        input.down  = data & 0x8;
 }
 
 void GameServer::updatePlayers(sf::Time delta)

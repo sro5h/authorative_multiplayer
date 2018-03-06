@@ -2,6 +2,7 @@
 #define COMMON_HPP_INCLUDED
 
 #include "Types.hpp"
+#include "Packet.hpp"
 #include <SFML/System/Time.hpp>
 #include <SFML/System/Vector2.hpp>
 
@@ -37,6 +38,11 @@ struct PlayerInput
 
         bool right, left, up, down;
 };
+
+Packet& operator<<(Packet&, const ClientMessage&);
+Packet& operator>>(Packet&, ClientMessage&);
+Packet& operator<<(Packet&, const ServerMessage&);
+Packet& operator>>(Packet&, ServerMessage&);
 
 void logEvent(const Event& event);
 
