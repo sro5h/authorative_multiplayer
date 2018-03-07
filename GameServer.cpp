@@ -75,17 +75,13 @@ void GameServer::onReceive(Peer& peer, Packet& packet)
 
         switch (msgType)
         {
-                case ClientMessage::Input:
-                {
-                        onReceiveInput(peer, packet);
-                }
+        case ClientMessage::Input:
+                onReceiveInput(peer, packet);
                 break;
 
-                default:
-                {
-                        std::cerr << "Unknown message type ";
-                        std::cerr << static_cast<Uint8>(msgType) << std::endl;
-                }
+        default:
+                std::cerr << "Unknown message type ";
+                std::cerr << static_cast<Uint8>(msgType) << std::endl;
                 break;
         }
 }
