@@ -135,7 +135,9 @@ void GameClient::draw()
                 shape.setPosition(pair.second.position);
 
                 if (pair.first == mPeer.connectId)
-                        shape.setFillColor(sf::Color::Green);
+                        shape.setFillColor(sf::Color(64, 64, 157));
+                else
+                        shape.setFillColor(sf::Color(42, 42, 42));
 
                 mWindow.draw(shape);
         }
