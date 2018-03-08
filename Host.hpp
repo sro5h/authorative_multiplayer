@@ -7,7 +7,7 @@
 /**
  * Manages connections and sends Packets to connected Peers.
  */
-class Host final
+class Host
 {
 public:
         /**
@@ -18,7 +18,7 @@ public:
         /**
          * Cleans up the ENetHost and its connected ENetPeers if needed.
          */
-        ~Host();
+        virtual ~Host();
 
         /**
          * Creates the Host on address:port with a maximum of connections
