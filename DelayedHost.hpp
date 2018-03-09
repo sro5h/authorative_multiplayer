@@ -15,6 +15,14 @@ struct QueuedPacket
         const sf::Time time;
 };
 
+struct QueuedEvent
+{
+        QueuedEvent(const Event& event, const sf::Time time);
+
+        const Event event;
+        const sf::Time time;
+};
+
 class DelayedHost : public Host
 {
 public:
@@ -28,6 +36,7 @@ private:
         sf::Clock mClock;
 
         std::queue<QueuedPacket> mOutgoingQueue;
+        std::queue<QueuedEvent> mIncomingQueue;
 };
 
 #endif // DELAYED_HOST_HPP_INCLUDED
