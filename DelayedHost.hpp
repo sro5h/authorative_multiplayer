@@ -26,13 +26,14 @@ struct QueuedEvent
 class DelayedHost : public Host
 {
 public:
-        explicit DelayedHost(sf::Time delay);
+        explicit DelayedHost(sf::Time delayOutgoing, sf::Time delayIncoming);
 
         bool pollEvent(Event& event);
         bool send(const Peer& peer, const Packet& packet);
 
 private:
-        const sf::Time mDelay;
+        const sf::Time mDelayOutgoing;
+        const sf::Time mDelayIncoming;
         sf::Clock mClock;
 
         std::queue<QueuedPacket> mOutgoingQueue;

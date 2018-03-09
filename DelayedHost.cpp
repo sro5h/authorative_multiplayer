@@ -16,8 +16,9 @@ QueuedEvent::QueuedEvent(const Event& event, const sf::Time time)
 {
 }
 
-DelayedHost::DelayedHost(sf::Time delay)
-        : mDelay(delay)
+DelayedHost::DelayedHost(sf::Time delayOutgoing, sf::Time delayIncoming)
+        : mDelayOutgoing(delayOutgoing)
+        , mDelayIncoming(delayIncoming)
 {
 }
 
@@ -28,7 +29,7 @@ bool DelayedHost::pollEvent(Event& event)
         // Queue packets that should be sent
         elapsed = mClock.getElapsedTime();
         while (!mOutgoingQueue.empty()
-               && (elapsed - mOutgoingQueue.front().time) >= mDelay)
+               && (elapsed - mOutgoingQueue.front().time) >= mDelayOutgoing)
         {
                 QueuedPacket& item = mOutgoingQueue.front();
                 assert(item.peer);
@@ -44,7 +45,7 @@ bool DelayedHost::pollEvent(Event& event)
         }
 
         if (!mIncomingQueue.empty()
-             && (elapsed - mIncomingQueue.front().time) >= mDelay)
+             && (elapsed - mIncomingQueue.front().time) >= mDelayIncoming)
         {
                 event = mIncomingQueue.front().event;
                 mIncomingQueue.pop();
