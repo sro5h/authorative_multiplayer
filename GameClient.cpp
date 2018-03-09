@@ -4,6 +4,7 @@
 
 GameClient::GameClient()
         : mWindow(sf::VideoMode(400, 400), "App")
+        , mHost(sf::milliseconds(100), sf::milliseconds(100))
         , mRunning(true)
 {
 }

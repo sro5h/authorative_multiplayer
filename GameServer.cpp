@@ -4,6 +4,7 @@
 
 GameServer::GameServer()
         : mPort(PORT_SV)
+        , mHost(sf::milliseconds(100), sf::milliseconds(100))
         , mRunning(true)
 {
 }

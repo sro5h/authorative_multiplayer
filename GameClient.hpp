@@ -2,7 +2,7 @@
 #define GAME_CLIENT_HPP_INCLUDED
 
 #include "Common.hpp"
-#include "Host.hpp"
+#include "DelayedHost.hpp"
 #include <SFML/Graphics.hpp>
 #include <map>
 
@@ -30,7 +30,7 @@ private:
 private:
         sf::RenderWindow mWindow;
 
-        Host mHost;
+        DelayedHost mHost;
         Peer mPeer;
         bool mRunning;
 

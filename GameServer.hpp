@@ -2,7 +2,7 @@
 #define GAME_SERVER_HPP_INCLUDED
 
 #include "Common.hpp"
-#include "Host.hpp"
+#include "DelayedHost.hpp"
 #include <SFML/System/Time.hpp>
 #include <map>
 
@@ -28,7 +28,7 @@ private:
 private:
         const Uint16 mPort;
 
-        Host mHost;
+        DelayedHost mHost;
         bool mRunning;
 
         std::map<Uint32, PlayerState> mPlayers;
