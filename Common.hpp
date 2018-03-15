@@ -36,6 +36,7 @@ struct PlayerInput
 {
         PlayerInput();
 
+        Uint32 id;
         bool right, left, up, down;
 };
 

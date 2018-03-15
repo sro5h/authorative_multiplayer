@@ -6,6 +6,7 @@ GameClient::GameClient()
         : mWindow(sf::VideoMode(400, 400), "App")
         , mHost(sf::milliseconds(100), sf::milliseconds(100))
         , mRunning(true)
+        , mInputIdCounter(1)
 {
 }
 
@@ -87,9 +88,10 @@ void GameClient::onReceive(Peer& peer, Packet& packet)
 void GameClient::onReceiveState(Peer&, Packet& packet)
 {
         Uint32 connectId;
+        Uint32 inputId;
         float x, y;
 
-        while (packet >> connectId >> x >> y)
+        while (packet >> connectId >> inputId >> x >> y)
         {
                 if (mPlayers.find(connectId) == mPlayers.end())
                 {
@@ -122,6 +124,7 @@ void GameClient::processInput()
                 input |= 0x8;
 
         packet << ClientMessage::Input;
+        packet << getNextInputId();
         packet << input;
         mHost.send(mPeer, packet);
 }
@@ -171,4 +174,14 @@ bool GameClient::connect(const std::string& address, Uint16 port)
 bool GameClient::isRunning()
 {
         return mRunning;
+}
+
+Uint32 GameClient::getCurrentInputId() const
+{
+        return mInputIdCounter;
+}
+
+Uint32 GameClient::getNextInputId()
+{
+        return mInputIdCounter++;
 }

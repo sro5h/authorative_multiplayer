@@ -27,6 +27,9 @@ private:
 
         void onReceiveState(Peer& peer, Packet& packet);
 
+        Uint32 getCurrentInputId() const;
+        Uint32 getNextInputId();
+
 private:
         sf::RenderWindow mWindow;
 
@@ -35,6 +38,8 @@ private:
         bool mRunning;
 
         std::map<Uint32, PlayerState> mPlayers;
+
+        Uint32 mInputIdCounter;
 };
 
 #endif // GAME_CLIENT_HPP_INCLUDED
