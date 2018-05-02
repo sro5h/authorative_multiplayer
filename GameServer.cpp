@@ -45,6 +45,7 @@ void GameServer::update(sf::Time delta)
                 for (const auto& pair: mPlayers)
                 {
                         packet << pair.first;
+                        packet << mPlayers[pair.first].input.id;
                         packet << pair.second.state.position;
                 }
 
