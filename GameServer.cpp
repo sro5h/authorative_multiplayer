@@ -89,10 +89,12 @@ void GameServer::onReceive(Peer& peer, Packet& packet)
 
 void GameServer::onReceiveInput(Peer& peer, Packet& packet)
 {
+        Uint32 id;
         Uint8 data;
-        packet >> data;
+        packet >> id >> data;
 
         PlayerInput& input = mPlayerInputs[peer.connectId];
+        input.id    = id;
         input.right = data & 0x1;
         input.left  = data & 0x2;
         input.up    = data & 0x4;

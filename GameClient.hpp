@@ -29,10 +29,11 @@ private:
 
 private:
         sf::RenderWindow mWindow;
-
         DelayedHost mHost;
-        Peer mPeer;
         bool mRunning;
+
+        Peer mPeer;
+        Uint32 mNextInputId;
 
         std::map<Uint32, PlayerState> mPlayers;
 };

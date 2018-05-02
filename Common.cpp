@@ -9,7 +9,8 @@ PlayerState::PlayerState()
 }
 
 PlayerInput::PlayerInput()
-        : right(false)
+        : id(0)
+        , right(false)
         , left(false)
         , up(false)
         , down(false)

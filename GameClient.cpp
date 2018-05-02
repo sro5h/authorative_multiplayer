@@ -6,6 +6,7 @@ GameClient::GameClient()
         : mWindow(sf::VideoMode(400, 400), "App")
         , mHost(sf::milliseconds(100), sf::milliseconds(100))
         , mRunning(true)
+        , mNextInputId(1)
 {
 }
 
@@ -122,6 +123,7 @@ void GameClient::processInput()
                 input |= 0x8;
 
         packet << ClientMessage::Input;
+        packet << mNextInputId++;
         packet << input;
         mHost.send(mPeer, packet);
 }
