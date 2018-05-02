@@ -45,6 +45,20 @@ Packet& operator>>(Packet& p, ServerMessage& msg)
         return p;
 }
 
+Packet& operator<<(Packet& p, const sf::Vector2f& vec)
+{
+        return p << vec.x << vec.y;
+}
+
+Packet& operator>>(Packet& p, sf::Vector2f& vec)
+{
+        sf::Vector2f data;
+        if (p >> data.x >> data.y)
+                vec = data;
+
+        return p;
+}
+
 void logEvent(const Event& event)
 {
         if (event.type == Event::Type::Connect)

@@ -88,9 +88,9 @@ void GameClient::onReceive(Peer& peer, Packet& packet)
 void GameClient::onReceiveState(Peer&, Packet& packet)
 {
         Uint32 connectId;
-        float x, y;
+        sf::Vector2f position;
 
-        while (packet >> connectId >> x >> y)
+        while (packet >> connectId >> position)
         {
                 if (mPlayers.find(connectId) == mPlayers.end())
                 {
@@ -100,8 +100,7 @@ void GameClient::onReceiveState(Peer&, Packet& packet)
                 }
 
                 PlayerState& state = mPlayers[connectId];
-                state.position.x = x;
-                state.position.y = y;
+                state.position = position;
         }
 }
 
