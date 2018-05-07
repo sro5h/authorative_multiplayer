@@ -28,8 +28,8 @@ struct StateMessage
 {
         explicit StateMessage();
 
+        Uint32 id;
         sf::Vector2f pos;
-        sf::Vector2f vel;
 };
 
 struct InputMessage
@@ -44,6 +44,11 @@ Packet& operator<<(Packet&, const ClientMessage&);
 Packet& operator>>(Packet&, ClientMessage&);
 Packet& operator<<(Packet&, const ServerMessage&);
 Packet& operator>>(Packet&, ServerMessage&);
+
+Packet& operator<<(Packet&, const StateMessage&);
+Packet& operator>>(Packet&, StateMessage&);
+Packet& operator<<(Packet&, const InputMessage&);
+Packet& operator>>(Packet&, InputMessage&);
 
 void logEvent(const Event& event);
 

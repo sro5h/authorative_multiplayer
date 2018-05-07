@@ -43,9 +43,10 @@ void GameServer::update(sf::Time delta)
 
                 for (const auto& pair: mPlayers)
                 {
-                        packet << pair.first;
-                        packet << pair.second.pos.x;
-                        packet << pair.second.pos.y;
+                        StateMessage message;
+                        message.id = pair.first;
+                        message.pos = pair.second.pos;
+                        packet << message;
                 }
 
                 mHost.broadcast(packet);
@@ -89,14 +90,9 @@ void GameServer::onReceive(Peer& peer, Packet& packet)
 
 void GameServer::onReceiveInput(Peer& peer, Packet& packet)
 {
-        Uint8 data;
-        packet >> data;
-
-        InputMessage& input = mPlayers[peer.connectId].inputMessage;
-        input.right = data & 0x1;
-        input.left  = data & 0x2;
-        input.up    = data & 0x4;
-        input.down  = data & 0x8;
+        InputMessage message;
+        packet >> message;
+        mPlayers[peer.connectId].inputMessage = message;
 }
 
 void GameServer::updatePlayers(sf::Time delta)

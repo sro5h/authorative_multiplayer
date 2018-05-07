@@ -85,43 +85,41 @@ void GameClient::onReceive(Peer& peer, Packet& packet)
 
 void GameClient::onReceiveState(Peer&, Packet& packet)
 {
-        Uint32 connectId;
-        float x, y;
+        StateMessage message;
 
-        while (packet >> connectId >> x >> y)
+        while (packet >> message)
         {
-                if (mPlayers.find(connectId) == mPlayers.end())
+                if (mPlayers.find(message.id) == mPlayers.end())
                 {
                         std::cerr << "Received state of unknown player ";
-                        std::cerr << connectId << std::endl;
+                        std::cerr << message.id << std::endl;
                         continue;
                 }
 
-                Player& player = mPlayers[connectId];
-                player.pos.x = x;
-                player.pos.y = y;
+                Player& player = mPlayers[message.id];
+                player.pos = message.pos;
         }
 }
 
 void GameClient::processInput()
 {
         Packet packet;
-        Uint8 input = 0;
+        InputMessage message;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && mWindow.hasFocus())
-                input |= 0x1;
+                message.right = true;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && mWindow.hasFocus())
-                input |= 0x2;
+                message.left = true;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && mWindow.hasFocus())
-                input |= 0x4;
+                message.up = true;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && mWindow.hasFocus())
-                input |= 0x8;
+                message.down = true;
 
         packet << ClientMessage::Input;
-        packet << input;
+        packet << message;
         mHost.send(mPeer, packet);
 }
 
