@@ -24,18 +24,19 @@ enum class ServerMessage : Uint8
         State,
 };
 
-struct PlayerState
+struct StateMessage
 {
-        PlayerState();
+        explicit StateMessage();
 
-        sf::Vector2f position;
-        sf::Vector2f velocity;
+        sf::Vector2f pos;
+        sf::Vector2f vel;
 };
 
-struct PlayerInput
+struct InputMessage
 {
-        PlayerInput();
+        explicit InputMessage();
 
+        Uint32 id;
         bool right, left, up, down;
 };
 

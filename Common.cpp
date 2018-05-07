@@ -2,14 +2,15 @@
 #include "Event.hpp"
 #include <iostream>
 
-PlayerState::PlayerState()
-        : position(0.0f, 0.0f)
-        , velocity(0.0f, 0.0f)
+StateMessage::StateMessage()
+        : pos(0.0f, 0.0f)
+        , vel(0.0f, 0.0f)
 {
 }
 
-PlayerInput::PlayerInput()
-        : right(false)
+InputMessage::InputMessage()
+        : id(0)
+        , right(false)
         , left(false)
         , up(false)
         , down(false)

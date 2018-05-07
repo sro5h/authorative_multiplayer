@@ -9,6 +9,14 @@
 class GameClient
 {
 public:
+        struct Player
+        {
+                explicit Player() = default;
+
+                sf::Vector2f pos;
+                sf::Vector2f vel;
+        };
+
         explicit GameClient();
 
         void update(sf::Time time);
@@ -34,7 +42,7 @@ private:
         Peer mPeer;
         bool mRunning;
 
-        std::map<Uint32, PlayerState> mPlayers;
+        std::map<Uint32, Player> mPlayers;
 };
 
 #endif // GAME_CLIENT_HPP_INCLUDED

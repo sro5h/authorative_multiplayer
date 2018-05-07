@@ -2,6 +2,11 @@
 #include <iostream>
 #include <cassert>
 
+GameServer::Player::Player(Peer peer)
+        : peer(peer)
+{
+}
+
 GameServer::GameServer()
         : mPort(PORT_SV)
         , mRunning(true)
@@ -39,8 +44,8 @@ void GameServer::update(sf::Time delta)
                 for (const auto& pair: mPlayers)
                 {
                         packet << pair.first;
-                        packet << pair.second.position.x;
-                        packet << pair.second.position.y;
+                        packet << pair.second.pos.x;
+                        packet << pair.second.pos.y;
                 }
 
                 mHost.broadcast(packet);
@@ -50,24 +55,20 @@ void GameServer::update(sf::Time delta)
 void GameServer::onConnect(Peer& peer)
 {
         assert(mPlayers.find(peer.connectId) == mPlayers.end());
-        assert(mPlayerInputs.find(peer.connectId) == mPlayerInputs.end());
 
-        mPlayers.insert({ peer.connectId, PlayerState() });
-        mPlayerInputs.insert({ peer.connectId, PlayerInput() });
+        mPlayers.insert({ peer.connectId, Player(peer) });
 }
 
 void GameServer::onDisconnect(Peer& peer)
 {
         assert(mPlayers.find(peer.connectId) != mPlayers.end());
-        assert(mPlayerInputs.find(peer.connectId) != mPlayerInputs.end());
 
-        mPlayerInputs.erase(peer.connectId);
         mPlayers.erase(peer.connectId);
 }
 
 void GameServer::onReceive(Peer& peer, Packet& packet)
 {
-        assert(mPlayerInputs.find(peer.connectId) != mPlayerInputs.end());
+        assert(mPlayers.find(peer.connectId) != mPlayers.end());
         assert(packet.getDataSize() > 0);
 
         ClientMessage msgType;
@@ -91,7 +92,7 @@ void GameServer::onReceiveInput(Peer& peer, Packet& packet)
         Uint8 data;
         packet >> data;
 
-        PlayerInput& input = mPlayerInputs[peer.connectId];
+        InputMessage& input = mPlayers[peer.connectId].inputMessage;
         input.right = data & 0x1;
         input.left  = data & 0x2;
         input.up    = data & 0x4;
@@ -100,26 +101,28 @@ void GameServer::onReceiveInput(Peer& peer, Packet& packet)
 
 void GameServer::updatePlayers(sf::Time delta)
 {
-        for (auto& pair: mPlayerInputs)
+        for (auto& pair: mPlayers)
         {
                 sf::Vector2f accel;
-                if (pair.second.right)
+                const InputMessage& input = pair.second.inputMessage;
+
+                if (input.right)
                         accel.x += ACCELERATION;
 
-                if (pair.second.left)
+                if (input.left)
                         accel.x -= ACCELERATION;
 
-                if (pair.second.up)
+                if (input.up)
                         accel.y -= ACCELERATION;
 
-                if (pair.second.down)
+                if (input.down)
                         accel.y += ACCELERATION;
 
-                PlayerState& state = mPlayers[pair.first];
-                state.velocity += accel * delta.asSeconds();
+                Player& player = pair.second;
+                player.vel += accel * delta.asSeconds();
                 float friction = 1 / (1 + FRICTION * delta.asSeconds());
-                state.velocity *= friction;
-                state.position += state.velocity * delta.asSeconds();
+                player.vel *= friction;
+                player.pos += player.vel * delta.asSeconds();
         }
 }
 

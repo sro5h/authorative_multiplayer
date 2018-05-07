@@ -51,7 +51,7 @@ void GameClient::onConnect(Peer& peer)
         assert(mPlayers.find(peer.connectId) == mPlayers.end());
 
         mPeer = peer;
-        mPlayers.insert({ mPeer.connectId, PlayerState() });
+        mPlayers.insert({ mPeer.connectId, Player() });
 }
 
 void GameClient::onDisconnect(Peer& peer)
@@ -97,9 +97,9 @@ void GameClient::onReceiveState(Peer&, Packet& packet)
                         continue;
                 }
 
-                PlayerState& state = mPlayers[connectId];
-                state.position.x = x;
-                state.position.y = y;
+                Player& player = mPlayers[connectId];
+                player.pos.x = x;
+                player.pos.y = y;
         }
 }
 
@@ -132,7 +132,7 @@ void GameClient::draw()
         for (const auto& pair: mPlayers)
         {
                 sf::CircleShape shape(20.0f);
-                shape.setPosition(pair.second.position);
+                shape.setPosition(pair.second.pos);
 
                 if (pair.first == mPeer.connectId)
                         shape.setFillColor(sf::Color(64, 64, 157));
