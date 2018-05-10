@@ -5,6 +5,7 @@
 GameClient::GameClient()
         : mWindow(sf::VideoMode(400, 400), "App")
         , mRunning(true)
+        , mPlayerId(0)
 {
 }
 
@@ -48,18 +49,21 @@ void GameClient::update(sf::Time)
 
 void GameClient::onConnect(Peer& peer)
 {
-        assert(mPlayers.find(peer.connectId) == mPlayers.end());
+        assert(mPlayerId == 0);
 
+        mPlayerId = peer.connectId;
         mPeer = peer;
-        mPlayers.insert({ mPeer.connectId, PlayerState() });
+        mPlayerState = PlayerState();
 }
 
 void GameClient::onDisconnect(Peer& peer)
 {
         assert(mPeer == peer);
-        assert(mPlayers.find(peer.connectId) != mPlayers.end());
+        assert(mPlayerId == peer.connectId);
 
-        mPlayers.erase(mPeer.connectId);
+        mPlayerId = 0;
+        mPeer = Peer();
+        mPlayerState = PlayerState();
 }
 
 void GameClient::onReceive(Peer& peer, Packet& packet)
@@ -87,17 +91,23 @@ void GameClient::onReceiveState(Peer&, Packet& packet)
 {
         Uint32 connectId;
         float x, y;
+        packet >> connectId >> x >> y;
+
+        assert(mPlayerId == connectId);
+
+        mPlayerState.position.x = x;
+        mPlayerState.position.y = y;
 
         while (packet >> connectId >> x >> y)
         {
-                if (mPlayers.find(connectId) == mPlayers.end())
+                if (mOtherPlayers.find(connectId) == mOtherPlayers.end())
                 {
                         std::cerr << "Received state of unknown player ";
                         std::cerr << connectId << std::endl;
                         continue;
                 }
 
-                PlayerState& state = mPlayers[connectId];
+                PlayerState& state = mOtherPlayers[connectId];
                 state.position.x = x;
                 state.position.y = y;
         }
@@ -129,15 +139,20 @@ void GameClient::draw()
 {
         mWindow.clear();
 
-        for (const auto& pair: mPlayers)
+        for (const auto& item: mOtherPlayers)
         {
                 sf::CircleShape shape(20.0f);
-                shape.setPosition(pair.second.position);
+                shape.setPosition(item.second.position);
+                shape.setFillColor(sf::Color(42, 42, 42));
 
-                if (pair.first == mPeer.connectId)
-                        shape.setFillColor(sf::Color(64, 64, 157));
-                else
-                        shape.setFillColor(sf::Color(42, 42, 42));
+                mWindow.draw(shape);
+        }
+
+        if (mPlayerId != 0)
+        {
+                sf::CircleShape shape(20.0f);
+                shape.setPosition(mPlayerState.position);
+                shape.setFillColor(sf::Color(64, 64, 157));
 
                 mWindow.draw(shape);
         }

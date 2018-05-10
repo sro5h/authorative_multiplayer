@@ -31,10 +31,13 @@ private:
         sf::RenderWindow mWindow;
 
         Host mHost;
-        Peer mPeer;
         bool mRunning;
 
-        std::map<Uint32, PlayerState> mPlayers;
+        Uint32 mPlayerId;
+        Peer mPeer;
+        PlayerState mPlayerState;
+
+        std::map<Uint32, PlayerState> mOtherPlayers;
 };
 
 #endif // GAME_CLIENT_HPP_INCLUDED
