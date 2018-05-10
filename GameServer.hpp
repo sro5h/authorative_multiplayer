@@ -9,6 +9,15 @@
 class GameServer
 {
 public:
+        struct Player
+        {
+                explicit Player(Peer peer = Peer());
+
+                Peer peer;
+                PlayerState state;
+                PlayerInput lastInput;
+        };
+
         explicit GameServer();
 
         void update(sf::Time delta);
@@ -31,8 +40,7 @@ private:
         Host mHost;
         bool mRunning;
 
-        std::map<Uint32, PlayerState> mPlayers;
-        std::map<Uint32, PlayerInput> mPlayerInputs;
+        std::map<Uint32, Player> mPlayers;
 };
 
 #endif // GAME_SERVER_HPP_INCLUDED
