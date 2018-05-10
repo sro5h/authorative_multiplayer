@@ -35,22 +35,7 @@ void GameServer::update(sf::Time delta)
         }
 
         updatePlayers(delta);
-
-        if (!mPlayers.empty())
-        {
-                Packet packet;
-                packet << ServerMessage::State;
-
-                for (const auto& item: mPlayers)
-                {
-                        const PlayerState& state = item.second.state;
-                        packet << item.first;
-                        packet << state.position.x;
-                        packet << state.position.y;
-                }
-
-                mHost.broadcast(packet);
-        }
+        broadcastState();
 }
 
 void GameServer::onConnect(Peer& peer)
@@ -124,6 +109,30 @@ void GameServer::updatePlayers(sf::Time delta)
                 float friction = 1 / (1 + FRICTION * delta.asSeconds());
                 state.velocity *= friction;
                 state.position += state.velocity * delta.asSeconds();
+        }
+}
+
+void GameServer::broadcastState()
+{
+        for (const auto& item: mPlayers)
+        {
+                Packet packet;
+                packet << ServerMessage::State;
+
+                packet << item.first;
+                packet << item.second.state.position.x;
+                packet << item.second.state.position.y;
+
+                for (const auto& other: mPlayers)
+                {
+                        if (other.first == item.first) continue;
+
+                        packet << other.first;
+                        packet << other.second.state.position.x;
+                        packet << other.second.state.position.y;
+                }
+
+                mHost.send(item.second.peer, packet);
         }
 }
 

@@ -26,13 +26,14 @@ public:
         bool isRunning();
 
 private:
-        void updatePlayers(sf::Time delta);
-
         void onConnect(Peer& peer);
         void onDisconnect(Peer& peer);
         void onReceive(Peer& peer, Packet& packet);
 
         void onReceiveInput(Peer& peer, Packet& packet);
+
+        void updatePlayers(sf::Time delta);
+        void broadcastState();
 
 private:
         const Uint16 mPort;
