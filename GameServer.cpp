@@ -78,31 +78,39 @@ void GameServer::onReceiveInput(Peer& peer, Packet& packet)
         Uint8 data;
         packet >> data;
 
-        PlayerInput& input = mPlayers[peer.connectId].lastInput;
+        PlayerInput input;
         input.right = data & 0x1;
         input.left  = data & 0x2;
         input.up    = data & 0x4;
         input.down  = data & 0x8;
+
+        mPlayers[peer.connectId].inputs.push_back(input);
 }
 
 void GameServer::updatePlayers(sf::Time delta)
 {
         for (auto& item: mPlayers)
         {
-                const PlayerInput& input = item.second.lastInput;
                 sf::Vector2f accel;
 
-                if (input.right)
-                        accel.x += ACCELERATION;
+                if (!item.second.inputs.empty())
+                {
+                        const PlayerInput& input = item.second.inputs.back();
 
-                if (input.left)
-                        accel.x -= ACCELERATION;
+                        if (input.right)
+                                accel.x += ACCELERATION;
 
-                if (input.up)
-                        accel.y -= ACCELERATION;
+                        if (input.left)
+                                accel.x -= ACCELERATION;
 
-                if (input.down)
-                        accel.y += ACCELERATION;
+                        if (input.up)
+                                accel.y -= ACCELERATION;
+
+                        if (input.down)
+                                accel.y += ACCELERATION;
+
+                        item.second.inputs.clear();
+                }
 
                 PlayerState& state = item.second.state;
                 state.velocity += accel * delta.asSeconds();

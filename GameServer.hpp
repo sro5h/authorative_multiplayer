@@ -15,7 +15,7 @@ public:
 
                 Peer peer;
                 PlayerState state;
-                PlayerInput lastInput;
+                std::vector<PlayerInput> inputs;
         };
 
         explicit GameServer();
