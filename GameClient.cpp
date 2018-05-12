@@ -113,12 +113,13 @@ void GameClient::onReceiveState(Peer&, Packet& packet)
         }
         else
         {
-                // Check if predicited state is correct
+                // Goto relevant prediction
                 while (!mPredictions.empty() && mPredictions.front().tick < lastTick)
                         mPredictions.pop_front();
 
                 assert(!mPredictions.empty());
 
+                // Check if predicited state is correct
                 if (!equals(mPredictions.front().state, receivedState))
                 {
                         mPlayerState = receivedState;
