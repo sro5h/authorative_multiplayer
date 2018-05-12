@@ -52,8 +52,13 @@ static_assert(std::numeric_limits<float>::is_iec559, "Requires IEEE 754");
 #include <cmath>
 bool equals(float a, float b, float epsilon)
 {
-        float max = std::max({ 1.0f, a, b });
-        return std::abs(a - b) <= max * epsilon;
+        if (a == b) return true;
+
+        float diff = std::abs(a - b);
+        float absSum = std::abs(a) + std::abs(b);
+
+        return (diff / std::min(absSum, std::numeric_limits<float>::max()))
+               < epsilon;
 }
 
 bool equals(const sf::Vector2f& a, const sf::Vector2f& b)
