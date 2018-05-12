@@ -59,3 +59,30 @@ void logEvent(const Event& event)
                 std::cout << std::endl;
         }
 }
+
+void applyPlayerInput(sf::Time delta, const PlayerInput& input,
+                PlayerState& state)
+{
+        sf::Vector2f accel;
+
+        if (input.right)
+                accel.x += ACCELERATION;
+
+        if (input.left)
+                accel.x -= ACCELERATION;
+
+        if (input.up)
+                accel.y -= ACCELERATION;
+
+        if (input.down)
+                accel.y += ACCELERATION;
+
+        state.velocity += accel * delta.asSeconds();
+}
+
+void updatePlayerState(sf::Time delta, PlayerState& state)
+{
+        float friction = 1 / (1 + FRICTION * delta.asSeconds());
+        state.velocity *= friction;
+        state.position += state.velocity * delta.asSeconds();
+}

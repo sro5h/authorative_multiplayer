@@ -46,4 +46,8 @@ Packet& operator>>(Packet&, ServerMessage&);
 
 void logEvent(const Event& event);
 
+void applyPlayerInput(sf::Time delta, const PlayerInput& input,
+                PlayerState& state);
+void updatePlayerState(sf::Time delta, PlayerState& state);
+
 #endif // COMMON_HPP_INCLUDED
