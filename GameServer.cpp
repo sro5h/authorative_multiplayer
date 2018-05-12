@@ -75,8 +75,9 @@ void GameServer::onReceive(Peer& peer, Packet& packet)
 
 void GameServer::onReceiveInput(Peer& peer, Packet& packet)
 {
+        Uint32 tick;
         Uint8 data;
-        packet >> data;
+        packet >> tick >> data;
 
         PlayerInput input;
         input.right = data & 0x1;
@@ -85,6 +86,7 @@ void GameServer::onReceiveInput(Peer& peer, Packet& packet)
         input.down  = data & 0x8;
 
         mPlayers[peer.connectId].inputs.push_back(input);
+        mPlayers[peer.connectId].lastInputTick = tick;
 }
 
 void GameServer::updatePlayers(sf::Time delta)
@@ -128,6 +130,7 @@ void GameServer::broadcastState()
                 packet << ServerMessage::State;
 
                 packet << item.first;
+                packet << item.second.lastInputTick;
                 packet << item.second.state.position.x;
                 packet << item.second.state.position.y;
 

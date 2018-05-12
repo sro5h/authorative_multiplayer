@@ -15,6 +15,7 @@ public:
 
                 Peer peer;
                 PlayerState state;
+                Uint32 lastInputTick;
                 std::vector<PlayerInput> inputs;
         };
 

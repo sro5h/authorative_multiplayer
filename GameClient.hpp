@@ -19,19 +19,21 @@ public:
         bool isRunning();
 
 private:
-        void processInput();
-
         void onConnect(Peer& peer);
         void onDisconnect(Peer& peer);
         void onReceive(Peer& peer, Packet& packet);
 
         void onReceiveState(Peer& peer, Packet& packet);
 
+        void processInput();
+        void nextTick();
+        Uint32 getTick();
 private:
         sf::RenderWindow mWindow;
 
         Host mHost;
         bool mRunning;
+        Uint32 mTickCounter;
 
         Uint32 mPlayerId;
         Peer mPeer;

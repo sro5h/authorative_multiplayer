@@ -5,12 +5,15 @@
 GameClient::GameClient()
         : mWindow(sf::VideoMode(400, 400), "App")
         , mRunning(true)
+        , mTickCounter(0)
         , mPlayerId(0)
 {
 }
 
 void GameClient::update(sf::Time)
 {
+        nextTick();
+
         sf::Event sfEvent;
         while (mWindow.pollEvent(sfEvent))
         {
@@ -90,8 +93,9 @@ void GameClient::onReceive(Peer& peer, Packet& packet)
 void GameClient::onReceiveState(Peer&, Packet& packet)
 {
         Uint32 connectId;
+        Uint32 lastTick;
         float x, y;
-        packet >> connectId >> x >> y;
+        packet >> connectId >> lastTick >> x >> y;
 
         assert(mPlayerId == connectId);
 
@@ -131,6 +135,7 @@ void GameClient::processInput()
                 input |= 0x8;
 
         packet << ClientMessage::Input;
+        packet << getTick();
         packet << input;
         mHost.send(mPeer, packet);
 }
@@ -185,4 +190,14 @@ bool GameClient::connect(const std::string& address, Uint16 port)
 bool GameClient::isRunning()
 {
         return mRunning;
+}
+
+void GameClient::nextTick()
+{
+        mTickCounter++;
+}
+
+Uint32 GameClient::getTick()
+{
+        return mTickCounter;
 }
