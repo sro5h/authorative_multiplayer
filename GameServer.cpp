@@ -81,8 +81,8 @@ void GameServer::onReceiveInput(Peer& peer, Packet& packet)
         packet >> tick >> data;
 
         PlayerInput input;
-        input.right = data & 0x1;
-        input.left  = data & 0x2;
+        input.left  = data & 0x1;
+        input.right = data & 0x2;
         input.up    = data & 0x4;
         input.down  = data & 0x8;
 

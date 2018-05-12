@@ -161,11 +161,11 @@ void GameClient::processInput(sf::Time delta)
         PlayerInput input;
         Uint32 tick = getTick();
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && mWindow.hasFocus())
-                input.right = true;
-
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && mWindow.hasFocus())
                 input.left = true;
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && mWindow.hasFocus())
+                input.right = true;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && mWindow.hasFocus())
                 input.up = true;
@@ -183,10 +183,10 @@ void GameClient::processInput(sf::Time delta)
         Packet packet;
         Uint8 data = 0;
 
-        if (input.right)
+        if (input.left)
                 data |= 0x1;
 
-        if (input.left)
+        if (input.right)
                 data |= 0x2;
 
         if (input.up)

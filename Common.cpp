@@ -9,8 +9,8 @@ PlayerState::PlayerState()
 }
 
 PlayerInput::PlayerInput()
-        : right(false)
-        , left(false)
+        : left(false)
+        , right(false)
         , up(false)
         , down(false)
 {
@@ -87,11 +87,11 @@ void applyPlayerInput(sf::Time delta, const PlayerInput& input,
 {
         sf::Vector2f accel;
 
-        if (input.right)
-                accel.x += ACCELERATION;
-
         if (input.left)
                 accel.x -= ACCELERATION;
+
+        if (input.right)
+                accel.x += ACCELERATION;
 
         if (input.up)
                 accel.y -= ACCELERATION;

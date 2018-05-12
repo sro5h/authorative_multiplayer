@@ -36,7 +36,7 @@ struct PlayerInput
 {
         PlayerInput();
 
-        bool right, left, up, down;
+        bool left, right, up, down;
 };
 
 Packet& operator<<(Packet&, const ClientMessage&);
