@@ -154,18 +154,6 @@ void GameClient::onReceiveState(Peer&, Packet& packet)
                 state.position.x = x;
                 state.position.y = y;
         }
-
-        /*if (mPredictions.empty())
-        {
-                // No predicted input, just apply received state
-                mPlayerState.position = 
-        }
-        // Remove old elements from queue
-        while (!mPredictions.empty() && mPredictions.front().tick < lastTick)
-                mPredictions.pop();
-
-        if (!mPredictions.empty() && */
-
 }
 
 void GameClient::processInput(sf::Time delta)
