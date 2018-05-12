@@ -4,6 +4,7 @@
 
 GameServer::Player::Player(Peer peer)
         : peer(peer)
+        , lastInputTick(0)
 {
 }
 
@@ -84,6 +85,8 @@ void GameServer::onReceiveInput(Peer& peer, Packet& packet)
         input.left  = data & 0x2;
         input.up    = data & 0x4;
         input.down  = data & 0x8;
+
+        assert(tick > mPlayers[peer.connectId].lastInputTick);
 
         mPlayers[peer.connectId].inputs.push_back(input);
         mPlayers[peer.connectId].lastInputTick = tick;
