@@ -10,7 +10,7 @@ GameClient::GameClient()
 {
 }
 
-void GameClient::update(sf::Time)
+void GameClient::update(sf::Time delta)
 {
         nextTick();
 
@@ -23,11 +23,6 @@ void GameClient::update(sf::Time)
                         mWindow.close();
                         mRunning = false;
                 }
-        }
-
-        if (mPeer)
-        {
-                processInput();
         }
 
         Event event;
@@ -47,6 +42,11 @@ void GameClient::update(sf::Time)
                 {
                         onReceive(event.peer, event.packet);
                 }
+        }
+
+        if (mPeer)
+        {
+                processInput(delta);
         }
 }
 
@@ -94,13 +94,51 @@ void GameClient::onReceiveState(Peer&, Packet& packet)
 {
         Uint32 connectId;
         Uint32 lastTick;
-        float x, y;
-        packet >> connectId >> lastTick >> x >> y;
+        float x, y, vx, vy;
+        PlayerState receivedState;
+        packet >> connectId >> lastTick >> x >> y >> vx >> vy;
+
+        receivedState.position.x = x;
+        receivedState.position.y = y;
+        receivedState.velocity.x = vx;
+        receivedState.velocity.y = vy;
 
         assert(mPlayerId == connectId);
 
-        mPlayerState.position.x = x;
-        mPlayerState.position.y = y;
+        if (mPredictions.empty())
+        {
+                // No predicted state, just apply received state
+                mPlayerState.position = receivedState.position;
+                mPlayerState.velocity = receivedState.velocity;
+        }
+        else
+        {
+                // Check if predicited state is correct
+                while (!mPredictions.empty() && mPredictions.front().tick < lastTick)
+                        mPredictions.pop_front();
+
+                assert(!mPredictions.empty());
+
+                if (!equals(mPredictions.front().state, receivedState))
+                {
+                        mPlayerState = receivedState;
+
+                        // Correct prediction, apply all inputs, starting from
+                        // mPredictions.front().input
+                        for (const auto& prediction: mPredictions)
+                        {
+                                applyPlayerInput(TIME_PER_TICK, prediction.input, mPlayerState);
+                                updatePlayerState(TIME_PER_TICK, mPlayerState);
+                        }
+                }
+                else
+                {
+                        std::cout << "Prediction was correct :)" << std::endl;
+                }
+
+                // Prediction was handled
+                mPredictions.pop_front();
+        }
 
         while (packet >> connectId >> x >> y)
         {
@@ -115,28 +153,62 @@ void GameClient::onReceiveState(Peer&, Packet& packet)
                 state.position.x = x;
                 state.position.y = y;
         }
+
+        /*if (mPredictions.empty())
+        {
+                // No predicted input, just apply received state
+                mPlayerState.position = 
+        }
+        // Remove old elements from queue
+        while (!mPredictions.empty() && mPredictions.front().tick < lastTick)
+                mPredictions.pop();
+
+        if (!mPredictions.empty() && */
+
 }
 
-void GameClient::processInput()
+void GameClient::processInput(sf::Time delta)
 {
-        Packet packet;
-        Uint8 input = 0;
+        PlayerInput input;
+        Uint32 tick = getTick();
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && mWindow.hasFocus())
-                input |= 0x1;
+                input.right = true;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && mWindow.hasFocus())
-                input |= 0x2;
+                input.left = true;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && mWindow.hasFocus())
-                input |= 0x4;
+                input.up = true;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && mWindow.hasFocus())
-                input |= 0x8;
+                input.down = true;
+
+        // Store old state and input
+        mPredictions.push_back({ tick, mPlayerState, input });
+
+        applyPlayerInput(delta, input, mPlayerState);
+        updatePlayerState(delta, mPlayerState);
+
+        // Send input
+        Packet packet;
+        Uint8 data = 0;
+
+        if (input.right)
+                data |= 0x1;
+
+        if (input.left)
+                data |= 0x2;
+
+        if (input.up)
+                data |= 0x4;
+
+        if (input.down)
+                data |= 0x8;
 
         packet << ClientMessage::Input;
         packet << getTick();
-        packet << input;
+        packet << data;
         mHost.send(mPeer, packet);
 }
 

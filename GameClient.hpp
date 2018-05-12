@@ -5,10 +5,18 @@
 #include "Host.hpp"
 #include <SFML/Graphics.hpp>
 #include <map>
+#include <deque>
 
 class GameClient
 {
 public:
+        struct Prediction
+        {
+                Uint32 tick;
+                PlayerState state;
+                PlayerInput input;
+        };
+
         explicit GameClient();
 
         void update(sf::Time time);
@@ -25,7 +33,7 @@ private:
 
         void onReceiveState(Peer& peer, Packet& packet);
 
-        void processInput();
+        void processInput(sf::Time delta);
         void nextTick();
         Uint32 getTick();
 private:
@@ -38,6 +46,7 @@ private:
         Uint32 mPlayerId;
         Peer mPeer;
         PlayerState mPlayerState;
+        std::deque<Prediction> mPredictions;
 
         std::map<Uint32, PlayerState> mOtherPlayers;
 };

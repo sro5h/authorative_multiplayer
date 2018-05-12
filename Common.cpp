@@ -44,6 +44,28 @@ Packet& operator>>(Packet& p, ServerMessage& msg)
         return p;
 }
 
+#include <limits>
+static_assert(std::numeric_limits<float>::is_iec559, "Requires IEEE 754");
+
+
+#include <algorithm>
+#include <cmath>
+bool equals(float a, float b, float epsilon)
+{
+        float max = std::max({ 1.0f, a, b });
+        return std::abs(a - b) <= max * epsilon;
+}
+
+bool equals(const sf::Vector2f& a, const sf::Vector2f& b)
+{
+        return equals(a.x, b.x) && equals(a.y, b.y);
+}
+
+bool equals(const PlayerState& a, const PlayerState& b)
+{
+        return equals(a.position, b.position) && equals(a.velocity, b.velocity);
+}
+
 void logEvent(const Event& event)
 {
         if (event.type == Event::Type::Connect)

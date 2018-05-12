@@ -44,6 +44,10 @@ Packet& operator>>(Packet&, ClientMessage&);
 Packet& operator<<(Packet&, const ServerMessage&);
 Packet& operator>>(Packet&, ServerMessage&);
 
+bool equals(float a, float b, float epsilon = 0.00001f);
+bool equals(const sf::Vector2f& a, const sf::Vector2f& b);
+bool equals(const PlayerState& a, const PlayerState& b);
+
 void logEvent(const Event& event);
 
 void applyPlayerInput(sf::Time delta, const PlayerInput& input,

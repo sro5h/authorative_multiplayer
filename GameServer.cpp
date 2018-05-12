@@ -121,6 +121,8 @@ void GameServer::broadcastState()
                 packet << item.second.lastInputTick;
                 packet << item.second.state.position.x;
                 packet << item.second.state.position.y;
+                packet << item.second.state.velocity.x;
+                packet << item.second.state.velocity.y;
 
                 for (const auto& other: mPlayers)
                 {
