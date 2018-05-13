@@ -10,12 +10,18 @@ GameServer::Player::Player(Peer peer)
 
 GameServer::GameServer()
         : mPort(PORT_SV)
+        , mHost(5, 5)
         , mRunning(true)
+        , mTickCounter(0)
 {
 }
 
 void GameServer::update(sf::Time delta)
 {
+        nextTick();
+
+        mHost.update(getTick());
+
         Event event;
         while (mHost.pollEvent(event))
         {
@@ -151,4 +157,14 @@ bool GameServer::create()
 bool GameServer::isRunning()
 {
         return mRunning;
+}
+
+void GameServer::nextTick()
+{
+        ++mTickCounter;
+}
+
+Uint32 GameServer::getTick()
+{
+        return mTickCounter;
 }

@@ -7,7 +7,7 @@
 /**
  * Manages connections and sends Packets to connected Peers.
  */
-class Host final
+class Host
 {
 public:
         /**
@@ -60,7 +60,7 @@ public:
          * @param event The Event
          * @return True if an Event was found
          */
-        bool pollEvent(Event& event);
+        virtual bool pollEvent(Event& event);
 
         /**
          * Sends any queued packets on the host to its connected peers.
@@ -91,7 +91,7 @@ public:
          * @param peer The Peer to send the Packet to
          * @param packet The Packet to send
          */
-        bool send(const Peer& peer, const Packet& packet);
+        virtual bool send(const Peer& peer, const Packet& packet);
 
 public:
         /**

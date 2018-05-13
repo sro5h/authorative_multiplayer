@@ -2,7 +2,7 @@
 #define GAME_SERVER_HPP_INCLUDED
 
 #include "Common.hpp"
-#include "Host.hpp"
+#include "DelayedHost.hpp"
 #include <SFML/System/Time.hpp>
 #include <map>
 
@@ -36,11 +36,15 @@ private:
         void updatePlayers(sf::Time delta);
         void broadcastState();
 
+        void nextTick();
+        Uint32 getTick();
+
 private:
         const Uint16 mPort;
 
-        Host mHost;
+        DelayedHost mHost;
         bool mRunning;
+        Uint32 mTickCounter;
 
         std::map<Uint32, Player> mPlayers;
 };
