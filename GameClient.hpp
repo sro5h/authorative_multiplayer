@@ -10,6 +10,7 @@
 class GameClient
 {
 public:
+        // this state * input = nextState
         struct Prediction
         {
                 Uint32 tick;

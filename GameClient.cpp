@@ -127,15 +127,16 @@ void GameClient::onReceiveState(Peer&, Packet& packet)
 
                         // Correct prediction, apply all inputs, starting from
                         // mPredictions.front().input
-                        for (const auto& prediction: mPredictions)
+                        for (auto& prediction: mPredictions)
                         {
+                                // Correct the current prediction
+                                prediction.state = mPlayerState;
+
                                 applyPlayerInput(TIME_PER_TICK, prediction.input, mPlayerState);
                                 updatePlayerState(TIME_PER_TICK, mPlayerState);
                         }
-                }
-                else
-                {
-                        std::cout << "Prediction was correct :)" << std::endl;
+
+                        std::cout << "Prediction corrected" << std::endl;
                 }
 
                 // Prediction was handled
