@@ -57,6 +57,7 @@ void GameClient::onConnect(Peer& peer)
         mPlayerId = peer.connectId;
         mPeer = peer;
         mPlayerState = PlayerState();
+        mServerState = PlayerState();
 }
 
 void GameClient::onDisconnect(Peer& peer)
@@ -67,6 +68,7 @@ void GameClient::onDisconnect(Peer& peer)
         mPlayerId = 0;
         mPeer = Peer();
         mPlayerState = PlayerState();
+        mServerState = PlayerState();
 }
 
 void GameClient::onReceive(Peer& peer, Packet& packet)
@@ -98,12 +100,14 @@ void GameClient::onReceiveState(Peer&, Packet& packet)
         PlayerState receivedState;
         packet >> connectId >> lastTick >> x >> y >> vx >> vy;
 
+        assert(mPlayerId == connectId);
+
         receivedState.position.x = x;
         receivedState.position.y = y;
         receivedState.velocity.x = vx;
         receivedState.velocity.y = vy;
 
-        assert(mPlayerId == connectId);
+        mServerState = receivedState;
 
         if (mPredictions.empty())
         {
@@ -220,7 +224,14 @@ void GameClient::draw()
                 shape.setPosition(mPlayerState.position);
                 shape.setFillColor(sf::Color(64, 64, 157));
 
+                sf::CircleShape serverState(20.0f);
+                serverState.setPosition(mServerState.position);
+                serverState.setFillColor(sf::Color::Transparent);
+                serverState.setOutlineColor(sf::Color(124, 124, 217));
+                serverState.setOutlineThickness(1.0f);
+
                 mWindow.draw(shape);
+                mWindow.draw(serverState);
         }
 
         mWindow.display();

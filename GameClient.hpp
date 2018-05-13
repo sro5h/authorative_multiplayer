@@ -49,6 +49,9 @@ private:
         std::deque<Prediction> mPredictions;
 
         std::map<Uint32, PlayerState> mOtherPlayers;
+
+        // For debug purposes
+        PlayerState mServerState;
 };
 
 #endif // GAME_CLIENT_HPP_INCLUDED
