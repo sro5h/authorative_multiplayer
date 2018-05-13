@@ -83,14 +83,8 @@ void GameServer::onReceive(Peer& peer, Packet& packet)
 void GameServer::onReceiveInput(Peer& peer, Packet& packet)
 {
         Uint32 tick;
-        Uint8 data;
-        packet >> tick >> data;
-
         PlayerInput input;
-        input.left  = data & 0x1;
-        input.right = data & 0x2;
-        input.up    = data & 0x4;
-        input.down  = data & 0x8;
+        packet >> tick >> input;
 
         assert(tick > mPlayers[peer.connectId].lastInputTick);
 

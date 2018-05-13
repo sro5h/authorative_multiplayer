@@ -182,23 +182,9 @@ void GameClient::processInput(sf::Time delta)
 
         // Send input
         Packet packet;
-        Uint8 data = 0;
-
-        if (input.left)
-                data |= 0x1;
-
-        if (input.right)
-                data |= 0x2;
-
-        if (input.up)
-                data |= 0x4;
-
-        if (input.down)
-                data |= 0x8;
-
         packet << ClientMessage::Input;
         packet << getTick();
-        packet << data;
+        packet << input;
         mHost.send(mPeer, packet);
 }
 

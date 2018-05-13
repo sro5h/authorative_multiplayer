@@ -61,6 +61,39 @@ Packet& operator>>(Packet& p, sf::Vector2f& v)
         return p;
 }
 
+Packet& operator<<(Packet& p, const PlayerInput& input)
+{
+        Uint8 data = 0;
+
+        if (input.left)
+                data |= 0x1;
+
+        if (input.right)
+                data |= 0x2;
+
+        if (input.up)
+                data |= 0x4;
+
+        if (input.down)
+                data |= 0x8;
+
+        return p << data;
+}
+
+Packet& operator>>(Packet& p, PlayerInput& input)
+{
+        Uint8 data = 0;
+        if (p >> data)
+        {
+                input.left  = data & 0x1;
+                input.right = data & 0x2;
+                input.up    = data & 0x4;
+                input.down  = data & 0x8;
+        }
+
+        return p;
+}
+
 #include <limits>
 static_assert(std::numeric_limits<float>::is_iec559, "Requires IEEE 754");
 
