@@ -96,24 +96,21 @@ void GameClient::onReceiveState(Peer&, Packet& packet)
 {
         Uint32 connectId;
         Uint32 lastTick;
-        float x, y, vx, vy;
+        sf::Vector2f pos, vel;
         PlayerState receivedState;
-        packet >> connectId >> lastTick >> x >> y >> vx >> vy;
+        packet >> connectId >> lastTick >> pos >> vel;
 
         assert(mPlayerId == connectId);
 
-        receivedState.position.x = x;
-        receivedState.position.y = y;
-        receivedState.velocity.x = vx;
-        receivedState.velocity.y = vy;
+        receivedState.position = pos;
+        receivedState.velocity = vel;
 
         mServerState = receivedState;
 
         if (mPredictions.empty())
         {
                 // No predicted state, just apply received state
-                mPlayerState.position = receivedState.position;
-                mPlayerState.velocity = receivedState.velocity;
+                mPlayerState = receivedState;
         }
         else
         {
@@ -145,7 +142,7 @@ void GameClient::onReceiveState(Peer&, Packet& packet)
                 mPredictions.pop_front();
         }
 
-        while (packet >> connectId >> x >> y)
+        while (packet >> connectId >> pos)
         {
                 if (mOtherPlayers.find(connectId) == mOtherPlayers.end())
                 {
@@ -155,8 +152,7 @@ void GameClient::onReceiveState(Peer&, Packet& packet)
                 }
 
                 PlayerState& state = mOtherPlayers[connectId];
-                state.position.x = x;
-                state.position.y = y;
+                state.position = pos;
         }
 }
 

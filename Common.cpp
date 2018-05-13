@@ -44,6 +44,23 @@ Packet& operator>>(Packet& p, ServerMessage& msg)
         return p;
 }
 
+Packet& operator<<(Packet& p, const sf::Vector2f& v)
+{
+        return p << v.x << v.y;
+}
+
+Packet& operator>>(Packet& p, sf::Vector2f& v)
+{
+        float x, y;
+        if (p >> x >> y)
+        {
+                v.x = x;
+                v.y = y;
+        }
+
+        return p;
+}
+
 #include <limits>
 static_assert(std::numeric_limits<float>::is_iec559, "Requires IEEE 754");
 

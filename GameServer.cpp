@@ -125,18 +125,15 @@ void GameServer::broadcastState()
 
                 packet << item.first;
                 packet << item.second.lastInputTick;
-                packet << item.second.state.position.x;
-                packet << item.second.state.position.y;
-                packet << item.second.state.velocity.x;
-                packet << item.second.state.velocity.y;
+                packet << item.second.state.position;
+                packet << item.second.state.velocity;
 
                 for (const auto& other: mPlayers)
                 {
                         if (other.first == item.first) continue;
 
                         packet << other.first;
-                        packet << other.second.state.position.x;
-                        packet << other.second.state.position.y;
+                        packet << other.second.state.position;
                 }
 
                 mHost.send(item.second.peer, packet);
