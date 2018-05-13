@@ -121,6 +121,16 @@ bool equals(const PlayerState& a, const PlayerState& b)
         return equals(a.position, b.position) && equals(a.velocity, b.velocity);
 }
 
+#include <random>
+float frandom(float lower, float upper)
+{
+        static std::random_device rd;
+        static std::default_random_engine e(rd());
+
+        std::uniform_real_distribution<float> dist(lower, upper);
+        return dist(e);
+}
+
 void logEvent(const Event& event)
 {
         if (event.type == Event::Type::Connect)

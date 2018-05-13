@@ -54,6 +54,8 @@ bool equals(float a, float b, float epsilon = 0.00001f);
 bool equals(const sf::Vector2f& a, const sf::Vector2f& b);
 bool equals(const PlayerState& a, const PlayerState& b);
 
+float frandom(float lower = 0.0f, float upper = 1.0f);
+
 void logEvent(const Event& event);
 
 void applyPlayerInput(sf::Time delta, const PlayerInput& input,
