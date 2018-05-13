@@ -109,6 +109,13 @@ bool Host::pollEvent(Event& event)
         return false;
 }
 
+void Host::flush()
+{
+        assert(mHost);
+
+        enet_host_flush(mHost);
+}
+
 std::size_t Host::getConnectionCount() const
 {
         return (mHost) ? mHost->connectedPeers : 0;
@@ -164,10 +171,16 @@ bool Host::send(const Peer& peer, const Packet& packet)
         return rc == 0;
 }
 
+Host::operator bool() const
+{
+        return mHost != nullptr;
+}
+
 void Host::convertENetEvent(const ENetEvent& enetEvent, Event& event)
 {
         assert(enetEvent.type != ENET_EVENT_TYPE_NONE);
 
+        event = Event();
         ENetPeer* enetPeer = enetEvent.peer;
         convertENetPeer(*enetPeer, event.peer);
 

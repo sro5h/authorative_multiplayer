@@ -72,7 +72,7 @@ void GameClient::onDisconnect(Peer& peer)
 void GameClient::onReceive(Peer& peer, Packet& packet)
 {
         assert(mPeer == peer);
-        assert(packet.getDataSize() > 0);
+        assert(packet.getSize() > 0);
 
         ServerMessage msgType;
         packet >> msgType;

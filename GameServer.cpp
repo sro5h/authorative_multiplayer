@@ -56,7 +56,7 @@ void GameServer::onDisconnect(Peer& peer)
 void GameServer::onReceive(Peer& peer, Packet& packet)
 {
         assert(mPlayers.find(peer.connectId) != mPlayers.end());
-        assert(packet.getDataSize() > 0);
+        assert(packet.getSize() > 0);
 
         ClientMessage msgType;
         packet >> msgType;

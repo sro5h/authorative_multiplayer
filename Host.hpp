@@ -63,6 +63,11 @@ public:
         bool pollEvent(Event& event);
 
         /**
+         * Sends any queued packets on the host to its connected peers.
+         */
+        void flush();
+
+        /**
          * Get the number of connected Peers.
          * @return The number of connected Peers
          */
@@ -87,6 +92,13 @@ public:
          * @param packet The Packet to send
          */
         bool send(const Peer& peer, const Packet& packet);
+
+public:
+        /**
+         * Returns whether the Host is in a valid, initialized state.
+         * @return True if the Host is valid
+         */
+        explicit operator bool() const;
 
 private:
         struct PeerData

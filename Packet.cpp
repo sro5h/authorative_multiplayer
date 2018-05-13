@@ -31,14 +31,14 @@ const void* Packet::getData() const
         return !mData.empty() ? &mData[0] : nullptr;
 }
 
-std::size_t Packet::getDataSize() const
+std::size_t Packet::getSize() const
 {
         return mData.size();
 }
 
 bool Packet::dataLeft() const
 {
-        return mReadPos >= mData.size();
+        return mReadPos <= mData.size();
 }
 
 Packet::operator bool() const
@@ -284,6 +284,6 @@ ENetPacket* toENetPacket(const Packet& packet)
                         | ENET_PACKET_FLAG_UNSEQUENCED;
         }
 
-        return enet_packet_create(packet.getData(), packet.getDataSize(),
+        return enet_packet_create(packet.getData(), packet.getSize(),
                         enetFlags);
 }
