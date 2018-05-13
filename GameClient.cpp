@@ -115,8 +115,11 @@ void GameClient::onReceiveState(Peer&, Packet& packet)
         else
         {
                 // Goto relevant prediction
-                while (!mPredictions.empty() && mPredictions.front().tick < lastTick)
+                while (!mPredictions.empty()
+                       && (mPredictions.front().tick < lastTick))
+                {
                         mPredictions.pop_front();
+                }
 
                 assert(!mPredictions.empty());
 
