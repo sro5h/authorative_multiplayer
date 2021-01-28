@@ -1,5 +1,9 @@
+# Makefiles
+Makefile
+*.make
+
 # Object files
-*.o
+obj/
 
 # Binary files
-*.out
+bin/
