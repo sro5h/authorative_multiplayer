@@ -1,15 +1,15 @@
-#include "../Common.hpp"
-#define ENET_IMPLEMENTATION
-#include "../enet.h"
 #include "GameServer.hpp"
+#include "../common/Common.hpp"
+#include "../common/NetworkInitialiser.hpp"
 #include <SFML/System/Clock.hpp>
 #include <iostream>
 
 int main(int argc, char** argv) {
         sf::Uint16 port = Constants::PortSv;
+        NetworkInitialiser initialiser;
         GameServer server;
 
-        if (enet_initialize() != 0) {
+        if (!initialiser.initialise()) {
                 std::cout << "[server] Could not initialize enet." << std::endl;
                 return EXIT_FAILURE;
         }
@@ -19,7 +19,6 @@ int main(int argc, char** argv) {
         }
 
         if (!server.create(port)) {
-                enet_deinitialize();
                 return EXIT_FAILURE;
         }
 
@@ -38,8 +37,6 @@ int main(int argc, char** argv) {
                         server.update(Constants::TimePerTick);
                 }
         }
-
-        enet_deinitialize();
 
         return EXIT_SUCCESS;
 }

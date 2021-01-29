@@ -4,7 +4,7 @@ project "server"
         architecture "x86_64"
 
         kind "ConsoleApp"
-        files { "**.hpp", "**.cpp" }
+        files { "**.hpp", "**.cpp", "../common/**.hpp", "../common/**.cpp" }
         includedirs { }
         links {
                 "sfml-system",

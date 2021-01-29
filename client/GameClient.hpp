@@ -1,7 +1,7 @@
 #ifndef AM_GAME_CLIENT_HPP
 #define AM_GAME_CLIENT_HPP
 
-#include "../Common.hpp"
+#include "../common/Common.hpp"
 #include <string>
 
 struct _ENetHost;

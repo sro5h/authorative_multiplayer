@@ -1,7 +1,7 @@
 #ifndef AM_GAME_SERVER_HPP
 #define AM_GAME_SERVER_HPP
 
-#include "../Common.hpp"
+#include "../common/Common.hpp"
 #include <map>
 
 struct _ENetHost;
