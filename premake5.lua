@@ -2,6 +2,8 @@ workspace "authoritative_multiplayer"
         targetdir "bin/%{cfg.longname}/"
         objdir "obj/"
 
+        includedirs { "external/msgpack-c/include" }
+
         configurations { "Debug", "Release" }
 
         filter { "configurations:Debug" }

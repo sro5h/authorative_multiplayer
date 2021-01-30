@@ -1,4 +1,5 @@
 #include "GameServer.hpp"
+#include "../common/Messages.hpp"
 #include "../enet.h"
 #include <iostream>
 #include <cassert>
@@ -38,20 +39,23 @@ void GameServer::update(sf::Time delta) {
                         break;
                 }
         }
+
+        updateState(delta);
+        broadcastState();
 }
 
 void GameServer::onConnect(ENetPeer& peer) {
         assert(m_clients.find(peer.connectID) == m_clients.end());
 
         m_clients.insert({ peer.connectID, Client(&peer) });
-        std::cout << "[server] onConnect" << std::endl;
+        std::cout << "[server] onConnect " << peer.connectID << std::endl;
 }
 
 void GameServer::onDisconnect(ENetPeer& peer) {
         assert(m_clients.find(peer.connectID) != m_clients.end());
 
         m_clients.erase(peer.connectID);
-        std::cout << "[server] onDisconnect" << std::endl;
+        std::cout << "[server] onDisconnect " << peer.connectID << std::endl;
 }
 
 void GameServer::onDisconnectTimeout(ENetPeer& peer) {
@@ -62,7 +66,30 @@ void GameServer::onDisconnectTimeout(ENetPeer& peer) {
 void GameServer::onReceive(ENetPeer& peer, ENetPacket& packet) {
         assert(m_clients.find(peer.connectID) != m_clients.end());
         assert(packet.dataLength > 0);
+
+        std::size_t offset{0};
+        char const* data = reinterpret_cast<char*>(packet.data);
+        msgpack::object_handle handle =
+                msgpack::unpack(data, packet.dataLength, offset);
+        msgpack::object object = handle.get();
+
+        switch (object.as<ClientHeader>().messageType) {
+        case ClientHeader::MessageType::Input:
+                std::cout << "[server] Input received" << std::endl;
+                break;
+        }
+
         std::cout << "[server] onReceive" << std::endl;
+}
+
+void GameServer::updateState(sf::Time delta) {
+        /*for (auto& item: m_clients) {
+                Client& client = item.second;
+        }*/
+}
+
+void GameServer::broadcastState() {
+        /*for (*/
 }
 
 bool GameServer::create(sf::Uint16 port) {

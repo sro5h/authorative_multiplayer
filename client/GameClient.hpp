@@ -2,6 +2,7 @@
 #define AM_GAME_CLIENT_HPP
 
 #include "../common/Common.hpp"
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <string>
 
 struct _ENetHost;
@@ -27,16 +28,23 @@ private:
         void onDisconnectTimeout(_ENetPeer& peer);
         void onReceive(_ENetPeer& peer, _ENetPacket& packet);
 
+        void processInput(sf::Time delta);
+
         void nextTick();
         sf::Uint32 getTick() const;
 
 private:
+        sf::RenderWindow m_window;
+
         _ENetHost* m_host;
         bool m_running;
         sf::Uint32 m_tickCounter;
 
-        sf::Uint32 m_playerId;
         _ENetPeer* m_peer;
+        State m_localState;
+
+        // For debug purposes
+        State m_serverState;
 };
 
 #endif

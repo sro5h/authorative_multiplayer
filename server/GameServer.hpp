@@ -29,6 +29,9 @@ private:
         void onDisconnectTimeout(_ENetPeer& peer);
         void onReceive(_ENetPeer& peer, _ENetPacket& packet);
 
+        void updateState(sf::Time delta);
+        void broadcastState();
+
         void nextTick();
         sf::Uint32 getTick() const;
 
