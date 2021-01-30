@@ -67,10 +67,14 @@ void GameServer::onReceive(ENetPeer& peer, ENetPacket& packet) {
         assert(m_clients.find(peer.connectID) != m_clients.end());
         assert(packet.dataLength > 0);
 
-        std::size_t offset{0};
-        char const* data = reinterpret_cast<char*>(packet.data);
-        msgpack::object_handle handle =
-                msgpack::unpack(data, packet.dataLength, offset);
+        // !TODO: Eliminate copying of packet data
+        msgpack::unpacker unpacker;
+        unpacker.reserve_buffer(packet.dataLength);
+        std::memcpy(unpacker.buffer(), packet.data, packet.dataLength);
+        unpacker.buffer_consumed(packet.dataLength);
+
+        msgpack::object_handle handle;
+        unpacker.next(handle);
         msgpack::object object = handle.get();
 
         switch (object.as<ClientHeader>().messageType) {
