@@ -2,7 +2,9 @@
 #define AM_GAME_CLIENT_HPP
 
 #include "../common/Common.hpp"
+#include "../common/Messages.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <msgpack.hpp>
 #include <string>
 
 struct _ENetHost;
@@ -27,6 +29,8 @@ private:
         void onDisconnect(_ENetPeer& peer);
         void onDisconnectTimeout(_ENetPeer& peer);
         void onReceive(_ENetPeer& peer, _ENetPacket& packet);
+
+        void onReceiveState(_ENetPeer& peer, ServerHeader const& header, msgpack::unpacker& unpacker);
 
         void processInput(sf::Time delta);
 

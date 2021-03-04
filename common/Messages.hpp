@@ -26,11 +26,40 @@ struct InputMessage {
 public:
         explicit InputMessage() = default;
         explicit InputMessage(Input const& input)
-                : left{input.left}, right{input.right}, up{input.up}, down{input.down} { }
+                : input{input} { }
 
-        bool left, right, up, down;
+        Input input;
 
-        MSGPACK_DEFINE(left, right, up, down);
+        MSGPACK_DEFINE(input);
+};
+
+struct ServerHeader {
+public:
+        enum class MessageType {
+                State,
+        };
+
+        explicit ServerHeader() = default;
+        explicit ServerHeader(MessageType type, sf::Uint32 tick)
+                : messageType{type}, tick{tick} { }
+
+        MessageType messageType;
+        sf::Uint32 tick;
+
+        MSGPACK_DEFINE(messageType, tick);
+};
+
+MSGPACK_ADD_ENUM(ServerHeader::MessageType);
+
+struct StateMessage {
+public:
+        explicit StateMessage() = default;
+        explicit StateMessage(State const& state)
+                : state{state} { }
+
+        State state;
+
+        MSGPACK_DEFINE(state);
 };
 
 #endif

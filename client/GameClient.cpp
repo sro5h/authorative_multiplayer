@@ -93,7 +93,33 @@ void GameClient::onDisconnectTimeout(ENetPeer& peer) {
 void GameClient::onReceive(ENetPeer& peer, ENetPacket& packet) {
         assert(m_peer == &peer);
         assert(packet.dataLength > 0);
-        std::cout << "[client] onReceive" << std::endl;
+
+        // !TODO: Eliminate copying of packet data
+        msgpack::unpacker unpacker;
+        unpacker.reserve_buffer(packet.dataLength);
+        std::memcpy(unpacker.buffer(), packet.data, packet.dataLength);
+        unpacker.buffer_consumed(packet.dataLength);
+
+        msgpack::object_handle handle;
+        unpacker.next(handle);
+        msgpack::object object = handle.get();
+        ServerHeader header = object.as<ServerHeader>();
+
+        switch (header.messageType) {
+        case ServerHeader::MessageType::State:
+                onReceiveState(peer, header, unpacker);
+                break;
+        }
+}
+
+void GameClient::onReceiveState(ENetPeer& peer, ServerHeader const& header, msgpack::unpacker& unpacker) {
+        msgpack::object_handle handle;
+        unpacker.next(handle);
+        StateMessage message = handle.get().as<StateMessage>();
+
+        m_serverState = message.state;
+        // !TODO: Remove
+        m_localState = message.state;
 }
 
 void GameClient::processInput(sf::Time delta) {
@@ -127,7 +153,6 @@ void GameClient::processInput(sf::Time delta) {
                         ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT
         );
         enet_peer_send(m_peer, 0, packet);
-
 }
 
 bool GameClient::create(sf::Uint16 port) {

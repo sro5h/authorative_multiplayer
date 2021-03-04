@@ -5,7 +5,10 @@
 #include <cassert>
 
 GameServer::Client::Client(ENetPeer* peer)
-        : peer{peer} {
+        : peer{peer}
+        , state{}
+        , lastInputTick{0}
+        , inputs{} {
 }
 
 GameServer::GameServer()
@@ -40,7 +43,7 @@ void GameServer::update(sf::Time delta) {
                 }
         }
 
-        updateState(delta);
+        updateClients(delta);
         broadcastState();
 }
 
@@ -76,24 +79,58 @@ void GameServer::onReceive(ENetPeer& peer, ENetPacket& packet) {
         msgpack::object_handle handle;
         unpacker.next(handle);
         msgpack::object object = handle.get();
+        ClientHeader header = object.as<ClientHeader>();
 
-        switch (object.as<ClientHeader>().messageType) {
+        switch (header.messageType) {
         case ClientHeader::MessageType::Input:
-                std::cout << "[server] Input received" << std::endl;
+                onReceiveInput(peer, header, unpacker);
                 break;
         }
-
-        std::cout << "[server] onReceive" << std::endl;
 }
 
-void GameServer::updateState(sf::Time delta) {
-        /*for (auto& item: m_clients) {
+void GameServer::onReceiveInput(ENetPeer& peer, ClientHeader const& header, msgpack::unpacker& unpacker) {
+        Client& client = m_clients[peer.connectID];
+        msgpack::object_handle handle;
+        unpacker.next(handle);
+        InputMessage message = handle.get().as<InputMessage>();
+
+        if (header.tick > client.lastInputTick) {
+                client.inputs.push_back(message.input);
+                client.lastInputTick = header.tick;
+        }
+}
+
+void GameServer::updateClients(sf::Time delta) {
+        for (auto& item: m_clients) {
                 Client& client = item.second;
-        }*/
+
+                if (!client.inputs.empty()) {
+                        applyInput(delta, client.inputs.back(), client.state);
+                        client.inputs.clear();
+                }
+
+                updateState(delta, client.state);
+        }
 }
 
 void GameServer::broadcastState() {
-        /*for (*/
+        for (auto const& item: m_clients) {
+                Client const& client = item.second;
+
+                msgpack::sbuffer buffer;
+                msgpack::pack(buffer, ServerHeader{
+                                ServerHeader::MessageType::State,
+                                getTick()
+                });
+                msgpack::pack(buffer, StateMessage(client.state));
+
+                ENetPacket* packet = enet_packet_create(
+                                buffer.data(),
+                                buffer.size(),
+                                ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT
+                );
+                enet_peer_send(client.peer, 0, packet);
+        }
 }
 
 bool GameServer::create(sf::Uint16 port) {
