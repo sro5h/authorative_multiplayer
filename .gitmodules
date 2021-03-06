@@ -1,3 +1,6 @@
 [submodule "external/msgpack-c"]
 	path = external/msgpack-c
 	url = https://github.com/msgpack/msgpack-c
+[submodule "external/entt"]
+	path = external/entt
+	url = https://github.com/skypjack/entt
