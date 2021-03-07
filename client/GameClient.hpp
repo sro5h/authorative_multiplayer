@@ -5,7 +5,7 @@
 #include "../common/Common.hpp"
 #include "../common/Messages.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
-#include <entt/entt.hpp>
+#include <entt/entity/registry.hpp>
 #include <msgpack.hpp>
 #include <string>
 

@@ -2,7 +2,7 @@
 #define AM_INPUT_SYSTEM_HPP
 
 #include "../common/Common.hpp"
-#include <entt/entt.hpp>
+#include <entt/entity/registry.hpp>
 
 class InputSystem {
 public:

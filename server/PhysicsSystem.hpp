@@ -2,7 +2,7 @@
 #define AM_PHYSICS_SYSTEM_HPP
 
 #include "../common/Common.hpp"
-#include <entt/entt.hpp>
+#include <entt/entity/registry.hpp>
 
 class PhysicsSystem {
 public:

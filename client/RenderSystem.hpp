@@ -3,7 +3,7 @@
 
 #include "../common/Common.hpp"
 #include <SFML/Graphics/RenderTarget.hpp>
-#include <entt/entt.hpp>
+#include <entt/entity/registry.hpp>
 
 class RenderSystem {
 public:
