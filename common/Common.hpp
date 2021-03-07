@@ -18,8 +18,10 @@ constexpr float Friction = 10.0f;
 
 }
 
+// !TODO: Remove, store in StateMessage directly.
 struct State {
         explicit State() : position{}, velocity{} { }
+        explicit State(sf::Vector2f p, sf::Vector2f v) : position{p}, velocity{v} { }
 
         sf::Vector2f position;
         sf::Vector2f velocity;
@@ -34,8 +36,5 @@ struct Input {
 
         MSGPACK_DEFINE(left, right, up, down);
 };
-
-void applyInput(sf::Time delta, Input const& input, State& state);
-void updateState(sf::Time delta, State& state);
 
 #endif

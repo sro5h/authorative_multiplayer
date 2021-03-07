@@ -4,18 +4,17 @@
 #include <iostream>
 #include <cassert>
 
-GameServer::Client::Client(ENetPeer* peer)
+GameServer::Client::Client(ENetPeer* peer, entt::entity entity)
         : peer{peer}
-        , state{}
-        , lastInputTick{0}
-        , inputs{} {
+        , entity{entity} {
 }
 
 GameServer::GameServer()
         : m_host{nullptr}
         , m_running{true}
         , m_tickCounter{0}
-        , m_clients{} {
+        , m_clients{}
+        , m_registry{} {
 }
 
 void GameServer::update(sf::Time delta) {
@@ -50,13 +49,19 @@ void GameServer::update(sf::Time delta) {
 void GameServer::onConnect(ENetPeer& peer) {
         assert(m_clients.find(peer.connectID) == m_clients.end());
 
-        m_clients.insert({ peer.connectID, Client(&peer) });
+        auto entity = m_registry.create();
+        m_registry.emplace<Transform>(entity);
+        m_registry.emplace<History>(entity);
+
+        m_clients.insert({ peer.connectID, Client(&peer, entity) });
         std::cout << "[server] onConnect " << peer.connectID << std::endl;
 }
 
 void GameServer::onDisconnect(ENetPeer& peer) {
         assert(m_clients.find(peer.connectID) != m_clients.end());
 
+        // !TODO: Check if client exists
+        m_registry.destroy(m_clients[peer.connectID].entity);
         m_clients.erase(peer.connectID);
         std::cout << "[server] onDisconnect " << peer.connectID << std::endl;
 }
@@ -86,43 +91,39 @@ void GameServer::onReceive(ENetPeer& peer, ENetPacket& packet) {
                 onReceiveInput(peer, header, unpacker);
                 break;
         }
+
 }
 
 void GameServer::onReceiveInput(ENetPeer& peer, ClientHeader const& header, msgpack::unpacker& unpacker) {
         Client& client = m_clients[peer.connectID];
+        History& history = m_registry.get<History>(client.entity);
+
         msgpack::object_handle handle;
         unpacker.next(handle);
         InputMessage message = handle.get().as<InputMessage>();
 
-        if (header.tick > client.lastInputTick) {
-                client.inputs.push_back(message.input);
-                client.lastInputTick = header.tick;
+        if (header.tick > history.lastInputTick) {
+                history.inputs.push_back(message.input);
+                history.lastInputTick = header.tick;
         }
 }
 
 void GameServer::updateClients(sf::Time delta) {
-        for (auto& item: m_clients) {
-                Client& client = item.second;
-
-                if (!client.inputs.empty()) {
-                        applyInput(delta, client.inputs.back(), client.state);
-                        client.inputs.clear();
-                }
-
-                updateState(delta, client.state);
-        }
+        m_inputSystem.update(delta, m_registry);
+        m_physicsSystem.update(delta, m_registry);
 }
 
 void GameServer::broadcastState() {
         for (auto const& item: m_clients) {
                 Client const& client = item.second;
+                auto const& transform = m_registry.get<Transform>(client.entity);
 
                 msgpack::sbuffer buffer;
                 msgpack::pack(buffer, ServerHeader{
                                 ServerHeader::MessageType::State,
                                 getTick()
                 });
-                msgpack::pack(buffer, StateMessage(client.state));
+                msgpack::pack(buffer, StateMessage(transform));
 
                 ENetPacket* packet = enet_packet_create(
                                 buffer.data(),

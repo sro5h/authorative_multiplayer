@@ -2,6 +2,7 @@
 #define AM_MESSAGES_HPP
 
 #include "Common.hpp"
+#include "Components.hpp"
 #include <msgpack.hpp>
 
 struct ClientHeader {
@@ -54,8 +55,8 @@ MSGPACK_ADD_ENUM(ServerHeader::MessageType);
 struct StateMessage {
 public:
         explicit StateMessage() = default;
-        explicit StateMessage(State const& state)
-                : state{state} { }
+        explicit StateMessage(Transform const& transform)
+                : state{transform.position, transform.velocity} { }
 
         State state;
 

@@ -11,7 +11,10 @@ GameClient::GameClient()
         , m_host{nullptr}
         , m_running{true}
         , m_tickCounter{0}
-        , m_peer{nullptr} {
+        , m_peer{nullptr}
+        , m_connected{false}
+        , m_registry{}
+        , m_entity{entt::null} {
 }
 
 void GameClient::update(sf::Time delta) {
@@ -50,7 +53,7 @@ void GameClient::update(sf::Time delta) {
                 }
         }
 
-        if (m_peer) {
+        if (m_connected) {
                 processInput(delta);
         }
 }
@@ -59,11 +62,7 @@ void GameClient::render(sf::Time delta) {
         m_window.clear();
 
         if (m_peer) {
-                sf::CircleShape shape(20.0f);
-                shape.setPosition(m_localState.position);
-                shape.setFillColor(sf::Color(64, 64, 157));
-
-                m_window.draw(shape);
+                m_renderSystem.update(delta, m_registry, m_window);
         }
 
         m_window.display();
@@ -71,8 +70,13 @@ void GameClient::render(sf::Time delta) {
 
 void GameClient::onConnect(ENetPeer& peer) {
         m_peer = &peer;
-        m_localState = State{};
-        m_serverState = State{};
+        m_connected = true;
+
+        m_entity = m_registry.create();
+        m_registry.emplace<Transform>(m_entity);
+        m_serverEntity = m_registry.create();
+        m_registry.emplace<Transform>(m_serverEntity);
+
         std::cout << "[client] onConnect " << peer.connectID << std::endl;
 }
 
@@ -80,8 +84,9 @@ void GameClient::onDisconnect(ENetPeer& peer) {
         assert(m_peer == &peer);
 
         m_peer = nullptr;
-        m_localState = State{};
-        m_serverState = State{};
+        m_connected = false;
+        m_entity = entt::null;
+        m_serverEntity = entt::null;
         std::cout << "[client] onDisconnect " << peer.connectID << std::endl;
 }
 
@@ -117,9 +122,14 @@ void GameClient::onReceiveState(ENetPeer& peer, ServerHeader const& header, msgp
         unpacker.next(handle);
         StateMessage message = handle.get().as<StateMessage>();
 
-        m_serverState = message.state;
         // !TODO: Remove
-        m_localState = message.state;
+        auto& transform = m_registry.get<Transform>(m_entity);
+        transform.position = message.state.position;
+        transform.velocity = message.state.velocity;
+
+        auto& serverTransform = m_registry.get<Transform>(m_serverEntity);
+        serverTransform.position = message.state.position;
+        serverTransform.velocity = message.state.velocity;
 }
 
 void GameClient::processInput(sf::Time delta) {

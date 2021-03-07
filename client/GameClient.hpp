@@ -1,9 +1,11 @@
 #ifndef AM_GAME_CLIENT_HPP
 #define AM_GAME_CLIENT_HPP
 
+#include "RenderSystem.hpp"
 #include "../common/Common.hpp"
 #include "../common/Messages.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <entt/entt.hpp>
 #include <msgpack.hpp>
 #include <string>
 
@@ -45,10 +47,15 @@ private:
         sf::Uint32 m_tickCounter;
 
         _ENetPeer* m_peer;
-        State m_localState;
+        bool m_connected;
+
+        entt::registry m_registry;
+        entt::entity m_entity;
 
         // For debug purposes
-        State m_serverState;
+        entt::entity m_serverEntity;
+
+        RenderSystem m_renderSystem;
 };
 
 #endif

@@ -1,8 +1,11 @@
 #ifndef AM_GAME_SERVER_HPP
 #define AM_GAME_SERVER_HPP
 
+#include "InputSystem.hpp"
+#include "PhysicsSystem.hpp"
 #include "../common/Common.hpp"
 #include "../common/Messages.hpp"
+#include <entt/entt.hpp>
 #include <msgpack.hpp>
 #include <map>
 #include <vector>
@@ -14,13 +17,10 @@ struct _ENetPacket;
 class GameServer {
 public:
         struct Client {
-                explicit Client(_ENetPeer* peer = nullptr);
+                explicit Client(_ENetPeer* peer = nullptr, entt::entity entity = entt::null);
 
                 _ENetPeer* peer;
-                State state;
-                sf::Uint32 lastInputTick;
-                // !TODO: Maybe use fixed size buffer;
-                std::vector<Input> inputs;
+                entt::entity entity;
         };
 
         explicit GameServer();
@@ -50,6 +50,9 @@ private:
         sf::Uint32 m_tickCounter;
 
         std::map<sf::Uint32, Client> m_clients;
+        entt::registry m_registry;
+        InputSystem m_inputSystem;
+        PhysicsSystem m_physicsSystem;
 };
 
 #endif
