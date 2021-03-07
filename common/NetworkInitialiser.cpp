@@ -1,6 +1,6 @@
 #include "NetworkInitialiser.hpp"
 #define ENET_IMPLEMENTATION
-#include "../enet.h"
+#include <enet/include/enet.h>
 
 NetworkInitialiser::~NetworkInitialiser() {
         enet_deinitialize();

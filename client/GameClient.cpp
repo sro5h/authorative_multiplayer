@@ -1,8 +1,8 @@
 #include "GameClient.hpp"
 #include "../common/Messages.hpp"
-#include "../enet.h"
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
+#include <enet/include/enet.h>
 #include <iostream>
 #include <cassert>
 

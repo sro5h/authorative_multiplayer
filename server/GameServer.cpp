@@ -1,6 +1,6 @@
 #include "GameServer.hpp"
 #include "../common/Messages.hpp"
-#include "../enet.h"
+#include <enet/include/enet.h>
 #include <iostream>
 #include <cassert>
 

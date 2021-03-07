@@ -2,7 +2,7 @@ workspace "authoritative_multiplayer"
         targetdir "bin/%{cfg.longname}/"
         objdir "obj/"
 
-        includedirs { "external/msgpack-c/include", "external/entt/single_include" }
+        includedirs { "external", "external/msgpack-c/include", "external/entt/single_include" }
 
         configurations { "Debug", "Release" }
 
